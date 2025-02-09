@@ -1,0 +1,227 @@
+﻿@model DynamicDataModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Table View</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+    <style>
+        /* Enable horizontal scrolling */
+        .table-container {
+            max-width: 100%;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+        /* Table Styling */
+        table {
+            width: 100%;
+            table-layout: auto; /* Allow columns to adjust width dynamically */
+            border-collapse: collapse;
+        }
+
+        th {
+            white-space: normal !important; /* Allows text to wrap */
+            word-wrap: break-word; /* Breaks words if necessary */
+            text-align: center; /* Centers text */
+            max-width: 150px; /* Adjust width as needed */
+            padding: 10px;
+        }
+
+        /* Apply dynamic width to columns */
+        th, td {
+            min-width: 100px; /* Set a minimum width to avoid columns becoming too narrow */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            border: 1px solid white; /* Ensure visible borders */
+        }
+
+        /* Apply black background to the first 4 columns in the header */
+        th:nth-child(-n+4) {
+            background-color: black !important;
+            color: white;
+        }
+        /* Apply blue background to all other columns in the header */
+        th:nth-child(n+5) {
+            background-color: #0033a0 !important;
+            color: white;
+        }
+        /* Apply black background to the first 4 columns in the data cells */
+        td:nth-child(-n+4) {
+            background-color: black !important;
+            color: white !important;
+        }
+        /* Apply white background to all other data cells */
+        td:nth-child(n+5) {
+            background-color: white !important;
+            color: black !important;
+        }
+
+        /* Fix the first four columns */
+        th:nth-child(1), td:nth-child(1),
+        th:nth-child(2), td:nth-child(2),
+        th:nth-child(3), td:nth-child(3),
+        th:nth-child(4), td:nth-child(4) {
+            position: sticky;
+            z-index: 4;
+            background-color: black !important;
+            color: white;
+            border-right: 1px solid white; /* Ensure vertical line is visible */
+        }
+        /* First column - Adjust the left value */
+        th:nth-child(1), td:nth-child(1) {
+            left: 0;
+            padding: 10px;
+        }
+        /* Second column - Adjust the left value */
+        th:nth-child(2), td:nth-child(2) {
+            left: 100px;
+        }
+        /* Third column - Adjust the left value */
+        th:nth-child(3), td:nth-child(3) {
+            left: 200px;
+        }
+
+        /* Fourth column - Adjust the left value */
+        th:nth-child(4), td:nth-child(4) {
+            left: 300px;
+        }
+            
+
+    </style>
+</head>
+<body class="container mt-1">
+
+    @* <h2 class="mb-4 text-center">Dynamic Data Table</h2> *@
+
+    <!-- Search Employees Section -->
+    <div class="masterdiv mb-12">
+        <div class="row">
+            <div class="col-md-3">
+                <input type="text" name="textSearchEmployee" id="textSearchEmployee" class="selectorinput form-control" placeholder="Store" onkeyup="EmployeeFilter()">
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3">
+                <select class="form-control selector" id="Employees" multiple="">
+                    @foreach (var name in Model.Store)
+                    {
+                        <option value="@name"
+                                class="optionfilter selectorvalue"
+                                style="background-color: #0033a0; color: white;"
+                                data-toggle="tooltip"
+                                data-placement="right"
+                                title="@name">
+                            @name
+                        </option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Filter Section with Search Bar and Dropdown -->
+    <div class="filter-section row g-3 mb-3">
+        <div class="col-md-6">
+            <label for="filterColumn" class="form-label">Filter By:</label>
+            <select id="filterColumn" class="form-select">
+                <option value="">-- Select Column --</option>
+                @foreach (var field in Model.FieldNames)
+                {
+                    <option value="@field">@field</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label for="textSearchMarket" class="form-label">Search:</label>
+            <input type="text" id="textSearchMarket" class="form-control" placeholder="Search..." onkeyup="MarketFilter()">
+        </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-container">
+        <table id="dataTable" class="table table-striped table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    @foreach (var field in Model.FieldNames)
+                    {
+                        <th>@field</th>
+                    }
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model.TtlCount)
+                {
+                    <tr>
+                        @foreach (var field in Model.FieldNames)
+                        {
+                            <td data-column="@field">@(row.ContainsKey(field) ? row[field] : "--")</td>
+                        }
+                    </tr>
+                }
+                @foreach (var row in Model.Data)
+                {
+                    <tr>
+                        @foreach (var field in Model.FieldNames)
+                        {
+                            <td data-column="@field">@(row.ContainsKey(field) ? row[field] : "N/A")</td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Employee search filter logic
+        function EmployeeFilter() {
+            var input = document.getElementById("textSearchEmployee").value.toUpperCase();
+            var select = document.getElementById("Employees");
+            var options = select.getElementsByTagName("option");
+
+            for (var i = 0; i < options.length; i++) {
+                var option = options[i];
+                var text = option.textContent || option.innerText;
+
+                if (text.toUpperCase().indexOf(input) > -1) {
+                    option.style.display = "";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+        }
+
+        // Table row filter logic
+        function MarketFilter() {
+            var input = document.getElementById("textSearchMarket").value.toUpperCase();
+            var table = document.getElementById("dataTable");
+            var tr = table.getElementsByTagName("tr");
+            var selectedColumn = document.getElementById("filterColumn").value;
+
+            for (var i = 1; i < tr.length; i++) {
+                var tds = tr[i].getElementsByTagName("td");
+                var match = false;
+
+                for (var j = 0; j < tds.length; j++) {
+                    if (tds[j]) {
+                        var textValue = tds[j].textContent || tds[j].innerText;
+                        var columnName = tds[j].getAttribute("data-column");
+
+                        if (textValue.toUpperCase().indexOf(input) > -1 && (selectedColumn === "" || columnName === selectedColumn)) {
+                            match = true;
+                            break;
+                        }
+                    }
+                }
+                tr[i].style.display = match ? "" : "none";  // Show or hide the row based on the match
+            }
+        }
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
