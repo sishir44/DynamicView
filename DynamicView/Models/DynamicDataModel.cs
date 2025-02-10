@@ -4,8 +4,8 @@ namespace DynamicView.Models
     public class DynamicDataModel
     {
         public List<string> FieldNames { get; set; }
-        public List<Dictionary<string, object>> Data { get; set; }
-        public List<Dictionary<string, object>> TtlCount { get; set; }
+        public List<Dictionary<string, object>> TableData { get; set; }
+        public List<Dictionary<string, object>> TotalSum { get; set; }
        // public List<string> TtlCount { get; set; }
         public string FilterColumn { get; set; }
         public string FilterVluae { get; set; }

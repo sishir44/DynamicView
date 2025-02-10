@@ -24,8 +24,8 @@ public class DynamicDataController : Controller
             model = new DynamicDataModel
             {
                 FieldNames = await _dbService.GetFieldNamesAsync(),
-                Data = await _dbService.GetDataAsync(filterColumn, filterValue),
-                TtlCount = await _dbService.Total(filterColumn, filterColumn),
+                TableData = await _dbService.GetTableDataAsync(filterColumn, filterValue),
+                TotalSum = await _dbService.TotalSum(filterColumn, filterColumn),
                 Store = employeeNames
             };
         }

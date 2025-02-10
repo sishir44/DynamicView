@@ -39,7 +39,7 @@ public class DbService
 
 
     // Fetch data with optional filters
-    public async Task<List<Dictionary<string, object>>> GetDataAsync(string filterColumn, string filterValue)
+    public async Task<List<Dictionary<string, object>>> GetTableDataAsync(string filterColumn, string filterValue)
     {
         var dataList = new List<Dictionary<string, object>>();
 
@@ -74,7 +74,7 @@ public class DbService
         }
         return dataList;
     }
-    public async Task<List<Dictionary<string, object>>> Total(string filterColumn, string filterValue)
+    public async Task<List<Dictionary<string, object>>> TotalSum(string filterColumn, string filterValue)
     {
         var dataList = new List<Dictionary<string, object>>();
 
@@ -110,29 +110,6 @@ public class DbService
         return dataList;
     }
 
-    //public async Task<List<string>> Total()
-    //{
-    //    var count = new List<string>();
-
-    //    using (SqlConnection conn = new SqlConnection(_connectionString))
-    //    {
-    //        using (SqlCommand cmd = new SqlCommand("GetFct_StoreNumberTotal", conn)) // Adjust stored procedure name or query
-    //        {
-    //            cmd.CommandType = CommandType.StoredProcedure;
-    //            await conn.OpenAsync();
-
-    //            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-    //            {
-    //                while (await reader.ReadAsync())
-    //                {
-    //                    count.Add(reader.GetString(0)); // Assuming the name is in the first column
-    //                }
-    //            }
-    //        }
-    //    }
-    //    return count;
-    //}
-
     public async Task<List<string>> GetEmployeeNamesAsync()
     {
         var employeeNames = new List<string>();
@@ -156,29 +133,29 @@ public class DbService
         return employeeNames;
     }
 
-    public async Task<List<GenderCountModel>> TotalCount()
-    {
-        var genderCounts = new List<GenderCountModel>();
+    //public async Task<List<GenderCountModel>> TotalCount()
+    //{
+    //    var genderCounts = new List<GenderCountModel>();
 
-        using (SqlConnection conn = new SqlConnection(_connectionString))
-        {
-            using (SqlCommand cmd = new SqlCommand("SELECT Gender, COUNT(*) AS GenderCount FROM Dummy GROUP BY Gender", conn))
-            {
-                await conn.OpenAsync();
-                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
-                {
-                    while (await reader.ReadAsync())
-                    {
-                        genderCounts.Add(new GenderCountModel
-                        {
-                            Gender = reader.GetString(0), // Assuming "Gender" is of type string
-                            GenderCount = reader.GetInt32(1) // Assuming "GenderCount" is of type int
-                        });
-                    }
-                }
-            }
-        }
-        return genderCounts;
-    }
+    //    using (SqlConnection conn = new SqlConnection(_connectionString))
+    //    {
+    //        using (SqlCommand cmd = new SqlCommand("SELECT Gender, COUNT(*) AS GenderCount FROM Dummy GROUP BY Gender", conn))
+    //        {
+    //            await conn.OpenAsync();
+    //            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+    //            {
+    //                while (await reader.ReadAsync())
+    //                {
+    //                    genderCounts.Add(new GenderCountModel
+    //                    {
+    //                        Gender = reader.GetString(0), // Assuming "Gender" is of type string
+    //                        GenderCount = reader.GetInt32(1) // Assuming "GenderCount" is of type int
+    //                    });
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return genderCounts;
+    //}
 
 }
