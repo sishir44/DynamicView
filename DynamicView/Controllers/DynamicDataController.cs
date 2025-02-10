@@ -17,16 +17,11 @@ public class DynamicDataController : Controller
 
         try
         {
-            var employeeNames = await _dbService.GetEmployeeNamesAsync();
-           // var ttlCount = await _dbService.Total(filterColumn, filterColumn);
-            //var ttlCount = await _dbService.Total();
-
             model = new DynamicDataModel
             {
                 FieldNames = await _dbService.GetFieldNamesAsync(),
                 TableData = await _dbService.GetTableDataAsync(filterColumn, filterValue),
                 TotalSum = await _dbService.TotalSum(filterColumn, filterColumn),
-                Store = employeeNames
             };
         }
         catch (Exception ex)
