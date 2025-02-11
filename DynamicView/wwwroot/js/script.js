@@ -13,8 +13,14 @@ function StoreFilter() {
     let tr = table.getElementsByTagName("tr");
 
     for (let i = 1; i < tr.length; i++) {
+        console.log(tr[i].id);
         let td = tr[i].querySelector("[data-column='Store']"); // Find the "Store" column
-        if (td) {
+        let grandTotalRow = tr[i].id === "grandTotalRow";
+        if (grandTotalRow) {
+            // Ensure grand total row is always visible
+            tr[i].style.display = "";
+
+        } else if(td) {
             let textValue = td.textContent || td.innerText;
             tr[i].style.display = textValue.toLowerCase().includes(input) ? "" : "none";
         }
@@ -35,8 +41,14 @@ function DealerCodeFilter() {
     let tr = table.getElementsByTagName("tr");
 
     for (let i = 1; i < tr.length; i++) {
+        console.log(tr[i].id);
         let td = tr[i].querySelector("[data-column='Dealer Code']");
-        if (td) {
+        let grandTotalRow = tr[i].id === "grandTotalRow";
+        if (grandTotalRow) {
+            // Ensure grand total row is always visible
+            tr[i].style.display = "";
+
+        } else if (td) {
             let textValue = td.textContent || td.innerText;
             tr[i].style.display = textValue.toLowerCase().includes(input) ? "" : "none";
         }
@@ -58,7 +70,12 @@ function MarketFilter() {
 
     for (let i = 1; i < tr.length; i++) {
         let td = tr[i].querySelector("[data-column='Market']");
-        if (td) {
+        let grandTotalRow = tr[i].id === "grandTotalRow";
+        if (grandTotalRow) {
+            // Ensure grand total row is always visible
+            tr[i].style.display = "";
+
+        } else if (td) {
             let textValue = td.textContent || td.innerText;
             tr[i].style.display = textValue.toLowerCase().includes(input) ? "" : "none";
         }
@@ -80,7 +97,12 @@ function TMFilter() {
 
     for (let i = 1; i < tr.length; i++) {
         let td = tr[i].querySelector("[data-column='TM']");
-        if (td) {
+        let grandTotalRow = tr[i].id === "grandTotalRow";
+        if (grandTotalRow) {
+            // Ensure grand total row is always visible
+            tr[i].style.display = "";
+
+        } else if (td) {
             let textValue = td.textContent || td.innerText;
             tr[i].style.display = textValue.toLowerCase().includes(input) ? "" : "none";
         }
@@ -102,7 +124,11 @@ function RoleFilter() {
 
     for (let i = 1; i < tr.length; i++) {
         let td = tr[i].querySelector("[data-column='Role']");
-        if (td) {
+        let grandTotalRow = tr[i].id === "grandTotalRow";
+        if (grandTotalRow) {
+            // Ensure grand total row is always visible
+            tr[i].style.display = "";
+        } else if (td) {
             let textValue = td.textContent || td.innerText;
             tr[i].style.display = textValue.toLowerCase().includes(input) ? "" : "none";
         }
@@ -135,6 +161,61 @@ function TableDataFilter() {
         tr[i].style.display = match ? "" : "none";  // Show or hide the row based on the match
     }
 }
+
+//function dateFilterTable() {
+function dateFilterTable() {
+    // Get the selected date in YYYY-MM-DD format
+    var selectedDate = document.getElementById('selectedDate').value;
+
+    // Convert selectedDate to YYYYMMDD format
+    if (selectedDate !== "") {
+        selectedDate = selectedDate.replace(/-/g, ""); // Convert to YYYYMMDD
+    }
+
+    var table = document.getElementById('dataTable');
+    var rows = table.getElementsByTagName('tr'); // Get all rows of the table
+    var headers = table.getElementsByTagName('th'); // Get the headers
+    var dateColumnIndex = -1;
+
+    // Find the index of the DateKey column by searching headers
+    for (var i = 0; i < headers.length; i++) {
+        if (headers[i].textContent.trim().toLowerCase().includes("date") || headers[i].textContent.trim().toLowerCase().includes("datekey")) {
+            dateColumnIndex = i;
+            break;
+        }
+    }
+
+    // If the DateKey column is not found, exit the function
+    if (dateColumnIndex === -1) {
+        console.error("Date column not found.");
+        return;
+    }
+
+    // Loop through all rows (skip the header and grand total row)
+    for (var i = 1; i < rows.length; i++) {
+        // Get all the table cells in the row
+        var cells = rows[i].getElementsByTagName('td');
+
+        // Check if the row has the expected number of cells (to avoid processing headers)
+        if (cells.length > 0) {
+            // Get the DateKey value from the detected column
+            var rowDateKey = cells[dateColumnIndex].textContent.trim(); // Use the dynamically found column
+
+            // If selectedDate is empty, show all rows
+            if (selectedDate === "" || rowDateKey === selectedDate) {
+                rows[i].style.display = ""; // Show row
+            } else {
+                rows[i].style.display = "none"; // Hide row
+            }
+        }
+    }
+}
+
+function refresh() {
+    window.location.reload();
+}
+
+
 
 
 

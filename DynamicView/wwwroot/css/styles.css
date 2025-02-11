@@ -3,6 +3,7 @@
     max-width: 100%;
     overflow-x: auto;
     white-space: nowrap;
+    margin-top:50px;
 }
 /* Table Styling */
 table {
@@ -91,3 +92,47 @@ th, td {
     text-align: center;
     margin-bottom: 5px;
 }
+
+.filterSearchBar {
+    display:none;
+}
+
+#selectedDate {
+    margin-top: 5px;
+    background-color: rgb(100, 155, 241);
+    font-size: 12px;
+    font-weight: bold;
+    color: #383b3f;
+    height: 30px;
+    border: black;
+    width: 120px;
+}
+
+.headerbtndiv {
+    /* Add custom button styles if needed */
+    width: 40px;
+    height: 40px;
+    padding: 0;
+}
+
+.ms-auto {
+    margin-left: auto; /* Pushes content to the right */
+}
+
+.d-flex {
+    display: flex;
+    align-items: center; /* Aligns items vertically in the center */
+}
+
+.ms-2 {
+    margin-left: 0.5rem; /* Adds some space between date picker and button */
+}
+
+.dateIcon {
+    background-color: #A5CFF0;
+    border-radius:10px;
+    align-content:center;
+}
+
+
+
