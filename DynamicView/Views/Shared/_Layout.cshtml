@@ -15,7 +15,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DynamicView</a>
+                <a class="navbar-brand" asp-area="" asp-controller="DynamicData" asp-action="Index">DynamicView</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -35,12 +35,12 @@
                 </div>
 
                 <!-- Right-aligned section for Date picker and Icon -->
-                <div class="d-flex align-items-center ms-auto">
+                @* <div class="d-flex align-items-center ms-auto">
                     <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date" onchange="dateFilterTable()">
                     <button type="submit" class="headerbtndiv btn ms-2 small-btn" title="First Load Data" id="" onclick="refresh()">
                         <i class="fas fa-retweet"></i>
                     </button>
-                </div>
+                </div> *@
                 
 
             </div>
@@ -62,7 +62,7 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="~/Scripts/your-scripts.js"></script>
-    <script src="~/js/script.js" asp-append-version="true"></script>
+    @* <script src="~/js/script.js" asp-append-version="true"></script> *@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -22,37 +22,37 @@ th {
 }
 
 /* Apply dynamic width to columns */
-th, td {
-    min-width: 100px; /* Set a minimum width to avoid columns becoming too narrow */
-    overflow: hidden;
+/*th, td {
+    min-width: 100px;*/ /* Set a minimum width to avoid columns becoming too narrow */
+    /*overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    border: 1px solid white; /* Ensure visible borders */
-}
+    border: 1px solid white;*/ /* Ensure visible borders */
+/*}*/
 
     /* Apply black background to the first 4 columns in the header */
-    th:nth-child(-n+4) {
+    /*th:nth-child(-n+4) {
         background-color: black !important;
         color: white;
-    }
+    }*/
     /* Apply blue background to all other columns in the header */
-    th:nth-child(n+5) {
+    /*th:nth-child(n+5) {
         background-color: #0033a0 !important;
         color: white;
-    }
+    }*/
     /* Apply black background to the first 4 columns in the data cells */
-    td:nth-child(-n+4) {
+    /*td:nth-child(-n+4) {
         background-color: black !important;
         color: white !important;
-    }
+    }*/
     /* Apply white background to all other data cells */
-    td:nth-child(n+5) {
+    /*td:nth-child(n+5) {
         background-color: white !important;
         color: black !important;
-    }
+    }*/
 
     /* Fix the first four columns */
-    th:nth-child(1), td:nth-child(1),
+    /*th:nth-child(1), td:nth-child(1),
     th:nth-child(2), td:nth-child(2),
     th:nth-child(3), td:nth-child(3),
     th:nth-child(4), td:nth-child(4) {
@@ -60,29 +60,30 @@ th, td {
         z-index: 10;
         background-color: black !important;
         color: white;
-        border-right: 1px solid white; /* Ensure vertical line is visible */
-    }
+        border-right: 1px solid white;*/ /* Ensure vertical line is visible */
+    /*}*/
     /* First column - Adjust the left value */
-    th:nth-child(1), td:nth-child(1) {
+    /*th:nth-child(1), td:nth-child(1) {
         left: 0;
         z-index: 11;
-    }
+    }*/
     /* Second column - Adjust the left value */
-    th:nth-child(2), td:nth-child(2) {
+    /*th:nth-child(2), td:nth-child(2) {
         left: 100px;
         z-index: 12;
-    }
+    }*/
     /* Third column - Adjust the left value */
-    th:nth-child(3), td:nth-child(3) {
+    /*th:nth-child(3), td:nth-child(3) {
         left: 200px;
         z-index: 13;
-    }
+    }*/
 
     /* Fourth column - Adjust the left value */
-    th:nth-child(4), td:nth-child(4) {
+    /*th:nth-child(4), td:nth-child(4) {
         left: 300px;
         z-index: 14;
-    }
+    }*/
+
 
 .optionfilter {
     font-size: 10px;
@@ -134,5 +135,9 @@ th, td {
     align-content:center;
 }
 
+.firstRowAlphabet th {
+    background-color: #D3D3D3 !important;
+    padding: 3px !important;
+}
 
 

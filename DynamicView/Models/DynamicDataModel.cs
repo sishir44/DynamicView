@@ -4,9 +4,19 @@ namespace DynamicView.Models
     public class DynamicDataModel
     {
         public List<string> FieldNames { get; set; }
+        public List<string> isFixedCol { get; set; }
+        public List<string> isFilterCol { get; set; }
+        public List<string> isSubTotalCol { get; set; }
         public List<Dictionary<string, object>> TableData { get; set; }
         public List<Dictionary<string, object>> TotalSum { get; set; }
-       // public List<string> TtlCount { get; set; }
+        public List<List<Dictionary<string, object>>> GetDynamicReport { get; set; }
+
+
+        public List<string> firstRowColumn { get; set; }
+        
+
+
+        // public List<string> TtlCount { get; set; }
         public string FilterColumn { get; set; }
         public string FilterVluae { get; set; }
         public List<string> Store { get; set; }
@@ -14,6 +24,9 @@ namespace DynamicView.Models
         public int MaleCount { get; set; }
         public int FemaleCount { get; set; }
 
-        
+        public string ReportName { get; set; }
+
+
+
     }
 }

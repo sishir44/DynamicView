@@ -2,7 +2,6 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-
 builder.Services.AddSingleton<DbService>();
 
 var app = builder.Build();
@@ -17,13 +16,18 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
-
 app.UseRouting();
-
 app.UseAuthorization();
 
+// Routing Default to DynamicViewPage
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=DynamicData}/{action=Index}");
+
+//app.MapControllerRoute(
+//    name: "dynamicData",
+//    pattern: "DynamicData/{reportId}",
+//    defaults: new { controller = "DynamicData", action = "Index" }
+//);
 
 app.Run();

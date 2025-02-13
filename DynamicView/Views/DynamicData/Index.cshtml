@@ -1,97 +1,226 @@
-﻿@model DynamicDataModel
+﻿@model DynamicView.Models.DynamicDataModel
+
+@{
+    ViewData["Title"] = Model.ReportName ?? "Dynamic Report";
+}
+
+@{
+    var fixedColumns = Model.FieldNames.Where(field => Model.isFixedCol.Contains(field)).ToList();
+    var remainingColumns = Model.FieldNames.Where(field => !Model.isFixedCol.Contains(field)).ToList();
+    var orderedColumns = fixedColumns.Concat(remainingColumns).ToList();
+    var isFixedColPresent = fixedColumns.Any(); // Check if fixed columns exist
+}
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamic Table View</title>
+    <title>@Model.ReportName</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <script src="~/js/script.js" asp-append-version="true"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Ensure the table container has horizontal scrolling */
+        .table-container {
+            overflow-x: auto;
+            max-width: 100%;
+            position: relative;
+        }
+
+        /* Style for fixed/sticky columns */
+        .fixed-column {
+            position: sticky !important;
+            background-color: black !important; 
+            color: white !important; 
+            border-right: 1px solid white; 
+            left: 0px; 
+            z-index: 10;
+        }
+    </style>
+
+    <script>
+
+        $(document).ready(function () {
+            $(".selectorinput").on("keyup", function () {
+                let columnId = $(this).attr("data-column"); 
+                let input = $(this).val().toLowerCase();
+
+                let $dropdown = $("#dropdown_" + columnId);
+                if ($dropdown.length) {
+                    $dropdown.find("option").each(function () {
+                        $(this).toggle($(this).text().toLowerCase().includes(input));
+                    });
+                }
+                $("#dataTable tbody tr").each(function () {
+                    let $row = $(this);
+                    let $td = $row.find(`[data-column='${columnId}']`); 
+                    let isGrandTotal = $row.attr("id") === "grandTotalRow";
+
+                    if (isGrandTotal) {
+                        $row.show();
+                    } else if ($td.length) {
+                        let textValue = $td.text().toLowerCase();
+                        $row.toggle(textValue.includes(input));
+                    }
+                });
+            });
+        });
+    </script>
+    <script>
+
+        $(document).ready(function () {
+            $("#selectedDate").on("change", function () {
+                let selectedDate = $(this).val(); 
+
+                if (!selectedDate) {
+                    console.warn("No date selected.");
+                    return;
+                }
+                if ($("#dataTable").length === 0) {
+                    console.error("Table #dataTable not found.");
+                }
+
+                $("#dataTable tbody tr").each(function () {
+                    let $row = $(this);
+                    let rowDate = $row.find("[data-column='DateKey']").text().trim(); 
+                    let isGrandTotal = $row.attr("id") === "grandTotalRow"; 
+
+                    if (isGrandTotal) {
+                        $row.show();
+                    } else if (rowDate.length === 8 && /^\d+$/.test(rowDate)) {
+                        let formattedRowDate = rowDate.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
+                        console.log("Row Date (Formatted):", formattedRowDate); // Debugging
+                        $row.toggle(formattedRowDate === selectedDate);
+                    } else {
+                        console.warn("Invalid DateKey:", rowDate);
+                        $row.hide(); 
+                    }
+                });
+            });
+        });
+    </script>
+
 
 </head>
 <body class="container mt-1">
-    
+    <h2>@Model.ReportName</h2>
+
     <!-- Search Section -->
     <div class="masterdiv mb-12">
-        
+
         <div class="row mt-3">
-            <div class="col-md-2"><input type="text" name="textSearchStore" id="textSearchStore" class="selectorinput form-control" placeholder="Store" onkeyup="StoreFilter()"></div>
+            @* <div class="col-md-2"><input type="text" name="textSearchStore" id="textSearchStore" class="selectorinput form-control" placeholder="Store" onkeyup="StoreFilter()"></div>
             <div class="col-md-2"><input type="text" name="textSearchdealerCode" id="textSearchdealerCode" class="selectorinput form-control" placeholder="Dealer Code" onkeyup="DealerCodeFilter()"></div>
             <div class="col-md-2"><input type="text" name="textSearchMarket" id="textSearchMarket" class="selectorinput form-control" placeholder="Market" onkeyup="MarketFilter()"></div>
             <div class="col-md-2"><input type="text" name="textSearchTM" id="textSearchTM" class="selectorinput form-control" placeholder="TM" onkeyup="TMFilter()"></div>
             <div class="col-md-2"><input type="text" name="textSearchRole" id="textSearchRole" class="selectorinput form-control" placeholder="Role" onkeyup="RoleFilter()"></div>
-
+            *@
+            @foreach (var column in Model.isFilterCol as List<string>)
+            {
+                var columnId = column.Replace(" ", ""); // Remove spaces to create valid IDs
+                <div class="col-md-2">
+                    <input type="text"
+                           name="textSearch@columnId"
+                           id="textSearch@columnId"
+                           class="selectorinput form-control"
+                           placeholder="Search @column..."
+                           data-column="@columnId" />
+                </div>
+            }
 
             <!-- Right-aligned section for Date picker and Icon -->
             <div class="d-flex align-items-center ms-auto col-md-2 dateIcon">
-                <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date" onchange="dateFilterTable()">
+                <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date">
                 <button type="submit" class="headerbtndiv btn ms-2 small-btn" title="First Load Data" id="" onclick="refresh()">
                     <i class="fas fa-retweet"></i>
                 </button>
             </div>
         </div>
-        <div class="row">
-            <div class="col-md-2">
-                <select class="form-control" id="Stores" multiple>
-                    @foreach (var data in Model.TableData) 
-                    {
-                        @if (data.ContainsKey("Store")) 
-                        {
-                            <option class="optionfilter" value="@data["Store"]" title="@data["Store"]">@data["Store"]</option>
-                        }
-                    }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-control" id="DealerCode" multiple>
-                    @foreach (var data in Model.TableData)
-                    {
-                        @if (data.ContainsKey("Dealer Code"))
-                        {
-                            <option class="optionfilter" value="@data["Dealer Code"]" title="@data["Dealer Code"]">@data["Dealer Code"]</option>
-                        }
-                    }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-control" id="Market" multiple>
-                    @foreach (var data in Model.TableData)
-                    {
-                        @if (data.ContainsKey("Market"))
-                        {
-                            <option class="optionfilter" value="@data["Market"]" title="@data["Market"]">@data["Market"]</option>
-                        }
-                    }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-control" id="TM" multiple>
-                    @foreach (var data in Model.TableData)
-                    {
-                        @if (data.ContainsKey("TM"))
-                        {
-                            <option class="optionfilter" value="@data["TM"]" title="@data["TM"]">@data["TM"]</option>
-                        }
-                    }
-                </select>
-            </div>
-            <div class="col-md-2">
-                <select class="form-control" id="Role" multiple>
-                    @foreach (var data in Model.TableData)
-                    {
-                        @if (data.ContainsKey("Role"))
-                        {
-                            <option class="optionfilter" value="@data["Role"]" title="@data["Role"]">@data["Role"]</option>
-                        }
-                    }
-                </select>
-            </div>
-            
+        @* <div class="row">
+        <div class="col-md-2">
+        <select class="form-control" id="Stores" multiple>
+        @foreach (var data in Model.TableData)
+        {
+        @if (data.ContainsKey("Store"))
+        {
+        <option class="optionfilter" value="@data["Store"]" title="@data["Store"]">@data["Store"]</option>
+        }
+        }
+        </select>
         </div>
-        
+        <div class="col-md-2">
+        <select class="form-control" id="DealerCode" multiple>
+        @foreach (var data in Model.TableData)
+        {
+        @if (data.ContainsKey("Dealer Code"))
+        {
+        <option class="optionfilter" value="@data["Dealer Code"]" title="@data["Dealer Code"]">@data["Dealer Code"]</option>
+        }
+        }
+        </select>
+        </div>
+        <div class="col-md-2">
+        <select class="form-control" id="Market" multiple>
+        @foreach (var data in Model.TableData)
+        {
+        @if (data.ContainsKey("Market"))
+        {
+        <option class="optionfilter" value="@data["Market"]" title="@data["Market"]">@data["Market"]</option>
+        }
+        }
+        </select>
+        </div>
+        <div class="col-md-2">
+        <select class="form-control" id="TM" multiple>
+        @foreach (var data in Model.TableData)
+        {
+        @if (data.ContainsKey("TM"))
+        {
+        <option class="optionfilter" value="@data["TM"]" title="@data["TM"]">@data["TM"]</option>
+        }
+        }
+        </select>
+        </div>
+        <div class="col-md-2">
+        <select class="form-control" id="Role" multiple>
+        @foreach (var data in Model.TableData)
+        {
+        @if (data.ContainsKey("Role"))
+        {
+        <option class="optionfilter" value="@data["Role"]" title="@data["Role"]">@data["Role"]</option>
+        }
+        }
+        </select>
+        </div>
+
+        </div> *@
+
+        <div class="row">
+            @foreach (var column in Model.isFilterCol as List<string>)
+            {
+                var columnId = column.Replace(" ", ""); 
+                var uniqueValues = Model.TableData
+                .Where(data => data.ContainsKey(column))
+                .Select(data => data[column]?.ToString()) 
+                .Distinct()
+                .ToList();
+
+                <div class="col-md-2">
+                    <select class="form-control filter-dropdown mt-2" id="dropdown_@columnId" size="5" data-column="@columnId">
+                        @foreach (var value in uniqueValues)
+                        {
+                            <option class="optionfilter" value="@value" title="@value">@value</option>
+                        }
+                    </select>
+                </div>
+            }
+        </div>
     </div>
-    
+
 
     <!-- Filter Section with Search Bar and Dropdown -->
     <div class="filter-section row g-3 mb-1 mt-1 filterSearchBar">
@@ -113,8 +242,14 @@
     <div class="table-container">
         <table id="dataTable" class="table table-striped table-bordered">
             <thead class="table-dark">
+                <tr class="firstRowAlphabet">
+                    @foreach (var column in Model.firstRowColumn)
+                    {
+                        <th>@column</th>
+                    }
+                </tr>
                 <tr>
-                    @foreach (var field in Model.FieldNames)
+                    @foreach (var field in orderedColumns)
                     {
                         <th>@field</th>
                     }
@@ -124,29 +259,97 @@
                 @foreach (var row in Model.TotalSum)
                 {
                     <tr id="grandTotalRow">
-                        <td>Grand Total</td>
-                        @foreach (var field in Model.FieldNames)
+                        @foreach (var field in orderedColumns)
                         {
-                            <td data-column="@field">@(row.ContainsKey(field) ? row[field] : "")</td>
+                            <td data-column="@field">
+                                @if (row.ContainsKey(field))
+                                {
+                                    var value = row[field];
+                                    @if ((value is decimal || value is float || value is double) && value.ToString().Contains("."))
+                                    {
+                                        @Convert.ToInt32(value)
+                                    }
+                                    else
+                                    {
+                                        @value
+                                    }
+                                }
+                                else
+                                {
+                                    @("--") 
+                                }
+                            </td>
                         }
                     </tr>
-
                 }
+
+                <!-- Data Rows -->
                 @foreach (var row in Model.TableData)
                 {
                     <tr>
-                        @foreach (var field in Model.FieldNames)
+                        @foreach (var field in orderedColumns)
                         {
-                            <td data-column="@field">@(row.ContainsKey(field) ? row[field] : "N/A")</td>
+                            <td data-column="@field">
+                                @if (row.ContainsKey(field))
+                                {
+                                    var value = row[field];
+                                    @if ((value is decimal || value is float || value is double) && value.ToString().Contains("."))
+                                    {
+                                        @Convert.ToInt32(value)
+                                    }
+                                    else
+                                    {
+                                        @value
+                                    }
+                                }
+                                else
+                                {
+                                    @("--") 
+                                }
+                            </td>
                         }
                     </tr>
                 }
             </tbody>
         </table>
     </div>
-    
-    <script src="~/js/script.js" asp-append-version="true"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Get fixed columns from Razor model
+            var fixedColumns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.isFixedCol));
+
+            if (fixedColumns.length > 0) {
+                let leftPosition = 0;
+                let zIndex = 10;
+
+                // Find column indexes dynamically
+                let headers = document.querySelectorAll("thead tr:nth-child(2) th"); // Second header row
+                let columnIndexMap = {};
+
+                headers.forEach((th, index) => {
+                    let columnName = th.textContent.trim();
+                    if (fixedColumns.includes(columnName)) {
+                        columnIndexMap[columnName] = index + 1; // nth-child starts at 1
+                    }
+                });
+
+                // Apply sticky styles to fixed columns
+                Object.keys(columnIndexMap).forEach((colName) => {
+                    let index = columnIndexMap[colName];
+
+                    document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
+                        cell.classList.add("fixed-column");
+                        cell.style.left = `${leftPosition}px`;
+                        cell.style.zIndex = zIndex;
+                    });
+
+                    leftPosition += 100; // Adjust spacing dynamically
+                    zIndex++;
+                });
+            }
+        });
+
+    </script>
 </body>
 </html>
