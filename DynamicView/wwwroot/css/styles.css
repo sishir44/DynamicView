@@ -48,6 +48,7 @@ td {
     min-width: 100px;*/ /* Set a minimum width to avoid columns becoming too narrow */
     /*overflow: hidden;
     text-overflow: ellipsis;
+
     white-space: nowrap;
     border: 1px solid white;*/ /* Ensure visible borders */
 /*}*/
