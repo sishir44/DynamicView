@@ -33,6 +33,16 @@ th, td {
     word-wrap: break-word;
 }
 
+/*.table-bordered {
+    border: 1px solid black;*/ /* Light gray border */
+/*}
+
+.table-bordered th,
+.table-bordered td {
+    border: 1px solid black;*/ /* Borders around table cells */
+    /*border-collapse:collapse;
+}*/
+
 /*th, td {
 
     word-wrap:break-word;*/
