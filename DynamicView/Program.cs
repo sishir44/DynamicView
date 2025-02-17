@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Hosting;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -31,3 +33,6 @@ app.MapControllerRoute(
 //);
 
 app.Run();
+//app.Run("http://0.0.0.0:5000");  // Listen on all network interfaces (change port if needed)
+//app.Run("http://192.168.29.3:5000");  // Listen on all network interfaces (change port if needed)
+// local ip address 192.168.29.3   http://192.168.29.3:5000

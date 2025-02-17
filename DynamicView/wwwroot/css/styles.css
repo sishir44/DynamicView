@@ -141,3 +141,119 @@ th {
 }
 
 
+/* new style for responsive*/
+
+/* Mobile and tablet responsive adjustments */
+@media (max-width: 768px) {
+    .table-container {
+        margin-top: 30px;
+    }
+
+    /* Adjust the font size for mobile/tablet */
+    th, td {
+        padding: 8px;
+        font-size: 12px;
+    }
+
+    /* Make the dropdowns smaller on mobile */
+    .filter-dropdown {
+        font-size: 12px;
+    }
+
+    /* Hide the search bar on mobile */
+    .filterSearchBar {
+        display: block;
+    }
+
+    /* Adjust date picker */
+    #selectedDate {
+        font-size: 10px;
+        width: 100px;
+    }
+
+    /* Align the header and filter button on mobile */
+    .ms-auto {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+
+    .dateIcon {
+        margin-top: 5px;
+    }
+
+    /* Ensure the table doesn't overflow and stays scrollable */
+    .table-container {
+        margin-top: 20px;
+        overflow-x: auto;
+    }
+    .searchBarFilter {
+        display: none;
+    }
+    .searchBarFilterData {
+        display: none;
+    }
+}
+
+/* Large screens and desktop */
+@media (min-width: 1024px) {
+    th, td {
+        padding: 12px;
+        font-size: 14px;
+    }
+
+    #selectedDate {
+        font-size: 14px;
+        width: 150px;
+    }
+
+    .headerbtndiv {
+        width: 50px;
+        height: 50px;
+    }
+
+    .dateIcon {
+        margin-top: 10px;
+    }
+}
+
+/* Small screens (Mobile) */
+@media (max-width: 480px) {
+    th, td {
+        font-size: 10px; /* Smaller font size for mobile */
+        padding: 5px;
+    }
+
+    #selectedDate {
+        font-size: 9px;
+        width: 90px;
+    }
+
+    /* Make dropdown and filter elements more compact */
+    .filter-dropdown {
+        font-size: 9px;
+    }
+
+    /* Adjust button size on smaller devices */
+    .headerbtndiv {
+        width: 35px;
+        height: 35px;
+    }
+
+    .dateIcon {
+        width: 100%;
+        padding: 5px;
+        text-align: center;
+    }
+
+    .ms-auto {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+    .searchBarFilter {
+        display: none;
+    }
+    .searchBarFilterData {
+        display:none;
+    }
+}
+                                                                              
