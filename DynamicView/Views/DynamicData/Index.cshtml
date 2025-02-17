@@ -74,33 +74,45 @@
 
         $(document).ready(function () {
             $("#selectedDate").on("change", function () {
-                let selectedDate = $(this).val(); 
+                let selectedDate = $(this).val();
 
                 if (!selectedDate) {
                     console.warn("No date selected.");
                     return;
                 }
+
                 if ($("#dataTable").length === 0) {
-                    console.error("Table #dataTable not found.");
+                    alert("Records are not available.");
+                    return;
                 }
+
+                let rowsFound = false;  
 
                 $("#dataTable tbody tr").each(function () {
                     let $row = $(this);
-                    let rowDate = $row.find("[data-column='DateKey']").text().trim(); 
-                    let isGrandTotal = $row.attr("id") === "grandTotalRow"; 
-
-                    if (isGrandTotal) {
-                        $row.show();
-                    } else if (rowDate.length === 8 && /^\d+$/.test(rowDate)) {
+                    let rowDate = $row.find("[data-column='DateKey']").text().trim();
+                    if (rowDate.length > 0 && /^\d+$/.test(rowDate)) {
+                        // Format the row date to 'YYYY-MM-DD' format
                         let formattedRowDate = rowDate.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
-                        console.log("Row Date (Formatted):", formattedRowDate); // Debugging
-                        $row.toggle(formattedRowDate === selectedDate);
+                        if (formattedRowDate === selectedDate) {
+                            $row.show();
+                            rowsFound = true;
+                        } else {
+                            $row.hide();
+                        }
                     } else {
                         console.warn("Invalid DateKey:", rowDate);
-                        $row.hide(); 
+                        $row.hide();
                     }
                 });
+
+                // If no rows match, display an alert
+                if (!rowsFound) {
+                    alert("No records available for the selected date.");
+                    refresh();
+                }
             });
+
         });
     </script>
 
@@ -134,8 +146,8 @@
 
             <!-- Right-aligned section for Date picker and Icon -->
             <div class="d-flex align-items-center ms-auto col-md-2 dateIcon">
-                <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date">
-                <button type="submit" class="headerbtndiv btn ms-2 small-btn" title="First Load Data" id="" onclick="refresh()">
+                <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date"> <br /> <br /> <br />
+                <button type="submit" class="headerbtndiv btn ms-0 small-btn refBtn" title="First Load Data" id="" onclick="refresh()">
                     <i class="fas fa-retweet"></i>
                 </button>
             </div>
@@ -281,7 +293,11 @@
                                 @if (row.ContainsKey(field))
                                 {
                                     var value = row[field];
-                                    @if ((value is decimal || value is float || value is double) && value.ToString().Contains("."))
+                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                    {
+                                        @Convert.ToInt32(decimalValue)
+                                    }
+                                    else if (value is decimal || value is float || value is double)
                                     {
                                         @Convert.ToInt32(value)
                                     }
@@ -309,7 +325,11 @@
                                 @if (row.ContainsKey(field))
                                 {
                                     var value = row[field];
-                                    @if ((value is decimal || value is float || value is double) && value.ToString().Contains("."))
+                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                    {
+                                        @Convert.ToInt32(decimalValue)
+                                    }
+                                    else if (value is decimal || value is float || value is double)
                                     {
                                         @Convert.ToInt32(value)
                                     }
@@ -320,10 +340,11 @@
                                 }
                                 else
                                 {
-                                    @("--") 
+                                    @("--")
                                 }
                             </td>
                         }
+
                     </tr>
                 }
             </tbody>
@@ -334,6 +355,36 @@
         document.addEventListener("DOMContentLoaded", function () {
             // Get fixed columns from Razor model
             var fixedColumns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.isFixedCol));
+
+            // if (fixedColumns.length > 0) {
+            //     let leftPosition = 0;
+            //     let zIndex = 10;
+
+            //     // Find column indexes dynamically
+            //     let headers = document.querySelectorAll("thead tr:nth-child(2) th"); // Second header row
+            //     let columnIndexMap = {};
+
+            //     headers.forEach((th, index) => {
+            //         let columnName = th.textContent.trim();
+            //         if (fixedColumns.includes(columnName)) {
+            //             columnIndexMap[columnName] = index + 1; // nth-child starts at 1
+            //         }
+            //     });
+
+            //     // Apply sticky styles to fixed columns
+            //     Object.keys(columnIndexMap).forEach((colName) => {
+            //         let index = columnIndexMap[colName];
+
+            //         document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
+            //             cell.classList.add("fixed-column");
+            //             cell.style.left = `${leftPosition}px`;
+            //             cell.style.zIndex = zIndex;
+            //         });
+
+            //         leftPosition += 100; // Adjust spacing dynamically
+            //         zIndex++;
+            //     });
+            // }
 
             if (fixedColumns.length > 0) {
                 let leftPosition = 0;
@@ -354,16 +405,25 @@
                 Object.keys(columnIndexMap).forEach((colName) => {
                     let index = columnIndexMap[colName];
 
+                    // Calculate the actual width of the column
+                    let firstCell = document.querySelector(`th:nth-child(${index})`);
+                    let columnWidth = firstCell ? firstCell.offsetWidth : 100; // Fallback to 100px if not found
+
                     document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
                         cell.classList.add("fixed-column");
                         cell.style.left = `${leftPosition}px`;
                         cell.style.zIndex = zIndex;
+                        cell.style.minWidth = `${columnWidth}px`; // Ensure all cells in the column match width
+                        cell.style.maxWidth = `${columnWidth}px`;
                     });
 
-                    leftPosition += 100; // Adjust spacing dynamically
+                    // Increment leftPosition based on actual column width
+                    leftPosition += columnWidth;
                     zIndex++;
                 });
             }
+
+
         });
 
     </script>

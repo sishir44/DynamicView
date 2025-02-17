@@ -13,13 +13,35 @@ table {
     border-collapse: separate;
 }
 
-th {
-    white-space: normal !important; /* Allows text to wrap */
-    word-wrap: break-word; /* Breaks words if necessary */
-    text-align: center; /* Centers text */
-    max-width: 150px; /* Adjust width as needed */
-    padding: 10px;
+/*th {
+    white-space: normal !important;*/ /* Allows text to wrap */
+    /*word-wrap: break-word;*/ /* Breaks words if necessary */
+    /*text-align: center;*/ /* Centers text */
+    /*max-width: 150px;*/ /* Adjust width as needed */
+   /* position: sticky;
+    z-index: 1;
+    top: 0;
+    background: black;*/
+/*}*/
+
+th, td {
+    position: sticky;
+    left: 0;
+    background: black; /* Ensures proper visibility */
+    z-index: 2; /* Keeps them above other columns */
+    white-space: normal; /* Prevents content wrapping */
+    word-wrap: break-word;
 }
+
+/*th, td {
+
+    word-wrap:break-word;*/
+   /* white-space:normal;*/
+/*}
+td {
+    padding: 8px;
+    text-align:left
+}*/
 
 /* Apply dynamic width to columns */
 /*th, td {
@@ -130,15 +152,26 @@ th {
 }
 
 .dateIcon {
-    background-color: #A5CFF0;
-    border-radius:10px;
-    align-content:center;
+    
+    /*border-radius: 10px;*/
+    align-content: center;
+    position: relative;
+    top: -50px;
+    right: -50px;
+    padding: 20px 5px;
+    height: 30px;
+    font-size: 14px;
 }
 
-.firstRowAlphabet th {
-    background-color: #D3D3D3 !important;
-    padding: 3px !important;
-}
+    .dateIcon .refBtn {
+        background-color: #A5CFF0;
+        height: 30px;
+    }
+
+    .firstRowAlphabet th {
+        background-color: #D3D3D3 !important;
+        padding: 3px !important;
+    }
 
 
 /* new style for responsive*/
