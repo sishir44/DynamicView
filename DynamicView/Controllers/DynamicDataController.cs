@@ -44,6 +44,9 @@ public class DynamicDataController : Controller
 
             var result = _dbService.GetDynamicReportNew(reportId);
             var firstTable = result.resultSet1[0];
+            var secondTable = result.resultSet2[0];
+            var fifthTable = result.resultSet5[0];
+
             var firstRow = firstTable?.Rows.Cast<DataRow>().FirstOrDefault();
             if (firstRow != null)
             {
@@ -72,22 +75,48 @@ public class DynamicDataController : Controller
                 }
             }
 
+            if (secondTable != null) { 
+                model.FieldNames = secondTable.Columns.Contains("AttributeName") ? secondTable.AsEnumerable().Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                                 .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
 
-            var secondTable = result.resultSet2[0];
-            model.FieldNames = secondTable.Columns.Contains("AttributeName") ? secondTable.AsEnumerable().Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                             .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
+                model.isFixedCol = secondTable.AsEnumerable()
+                                                .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                                                .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
 
-            model.isFixedCol = secondTable.AsEnumerable()
-                                            .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                                            .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
+                model.isFilterCol = secondTable.AsEnumerable()
+                                                .Where(row => row.Field<bool?>("isFilter") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                                                .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
 
-            model.isFilterCol = secondTable.AsEnumerable()
-                                            .Where(row => row.Field<bool?>("isFilter") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                                            .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
+                model.isSubTotalCol = secondTable.AsEnumerable()
+                                                .Where(row => row.Field<bool?>("isSubTotal") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                                                .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
+            }
 
-            model.isSubTotalCol = secondTable.AsEnumerable()
-                                            .Where(row => row.Field<bool?>("isSubTotal") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                                            .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
+
+            if (fifthTable != null && fifthTable.Columns.Contains("SubTotalProc") && fifthTable.Rows.Count > 0)
+            {
+                model.SubTotalResults = new List<Dictionary<string, object>>(); // ✅ Correct initialization
+
+                foreach (DataRow row in fifthTable.Rows)
+                {
+                    string storedProcName = row["SubTotalProc"]?.ToString();
+
+                    if (!string.IsNullOrEmpty(storedProcName))
+                    {
+                        // Execute the stored procedure using Data Access Layer
+                        var resultData = await _dbService.ExecuteStoredProcedureAsync(storedProcName);
+
+                        if(storedProcName == "GetFct_StoreNumberTotalMMM")
+                        {
+                            model.TotalMMM = resultData;
+                        }
+                        if (storedProcName == "GetFct_StoreNumberTotalTM")
+                        {
+                            model.TotalTM = resultData;
+                        }
+                    }
+                }
+            }
 
 
             // Generate alphabetic column names
@@ -96,6 +125,7 @@ public class DynamicDataController : Controller
 
             // Pass column names to the view
             model.firstRowColumn = columnNames; // Add a property in your model for ColumnNames
+
         }
         catch (Exception ex)
         {

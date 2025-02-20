@@ -25,7 +25,13 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <style>
         /* Ensure the table container has horizontal scrolling */
-        .table-container {
+        /* .table-container {
+                    overflow-x: auto;
+                    max-width: 100%;
+                    position: relative;
+           } */
+        
+        .body-scrollbar {
             overflow-x: auto;
             max-width: 100%;
             position: relative;
@@ -34,19 +40,18 @@
         /* Style for fixed/sticky columns */
         .fixed-column {
             position: sticky !important;
-            background-color: black !important; 
-            color: white !important; 
-            border-right: 1px solid white; 
-            left: 0px;  
+            background-color: black !important;
+            color: white !important;
+            border-right: 1px solid white;
+            left: 0px;
             z-index: 10;
         }
     </style>
 
     <script>
-
         $(document).ready(function () {
             $(".selectorinput").on("keyup", function () {
-                let columnId = $(this).attr("data-column"); 
+                let columnId = $(this).attr("data-column");
                 let input = $(this).val().toLowerCase();
 
                 let $dropdown = $("#dropdown_" + columnId);
@@ -55,23 +60,57 @@
                         $(this).toggle($(this).text().toLowerCase().includes(input));
                     });
                 }
+            });
+            // $("#dataTable tbody tr").each(function () {
+            //     let $row = $(this);
+            //     let $td = $row.find(`[data-column='${columnId}']`);
+            //     let isGrandTotal = $row.attr("id") === "grandTotalRow";
+
+            //     if (isGrandTotal) {
+            //         $row.show();
+            //     } else if ($td.length) {
+            //         let textValue = $td.text().toLowerCase();
+            //         $row.toggle(textValue.includes(input));
+            //     }
+            // });
+
+            // Handle clicking an option in the dropdown to filter data
+            $(".filter-dropdown").on("click", "option", function () {
+                let columnId = $(this).closest(".filter-dropdown").attr("data-column");
+                let selectedValue = $(this).val().toLowerCase();
+
+                // Filter the table based on the selected dropdown option
                 $("#dataTable tbody tr").each(function () {
                     let $row = $(this);
-                    let $td = $row.find(`[data-column='${columnId}']`); 
+                    let $td = $row.find(`[data-column='${columnId}']`);
                     let isGrandTotal = $row.attr("id") === "grandTotalRow";
 
                     if (isGrandTotal) {
                         $row.show();
                     } else if ($td.length) {
                         let textValue = $td.text().toLowerCase();
-                        $row.toggle(textValue.includes(input));
+                        if (selectedValue === "" || textValue.includes(selectedValue)) {
+                            $row.show();
+                        } else {
+                            $row.hide();
+                        }
+                    }
+                });
+
+                // Disable the filter dropdowns to the left of the selected column
+                let columnIndex = $(".filter-dropdown").index($(this).closest(".filter-dropdown"));
+                $(".filter-dropdown").each(function (index) {
+                    if (index < columnIndex) {
+                        $(this).prop("disabled", true).find('.optionfilter').css('background-color', '#7b7c7f');
+                    } else {
+                        $(this).prop("disabled", false);
                     }
                 });
             });
         });
+
     </script>
     <script>
-
         $(document).ready(function () {
             $("#selectedDate").on("change", function () {
                 let selectedDate = $(this).val();
@@ -86,14 +125,17 @@
                     return;
                 }
 
-                let rowsFound = false;  
+                let rowsFound = false;
 
                 $("#dataTable tbody tr").each(function () {
                     let $row = $(this);
-                    let rowDate = $row.find("[data-column='DateKey']").text().trim();
-                    if (rowDate.length > 0 && /^\d+$/.test(rowDate)) {
-                        // Format the row date to 'YYYY-MM-DD' format
-                        let formattedRowDate = rowDate.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
+                    let rowDate = $row.find("[data-column='TimeStamp']").text().trim();
+
+                    if (rowDate && rowDate !== '--') {
+                        let datePart = rowDate.split(" ")[0];
+                        //let formattedRowDate = rowDate.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
+                        let formattedRowDate = datePart.replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1");
+                        // Show row if it matches the selected date
                         if (formattedRowDate === selectedDate) {
                             $row.show();
                             rowsFound = true;
@@ -101,7 +143,7 @@
                             $row.hide();
                         }
                     } else {
-                        console.warn("Invalid DateKey:", rowDate);
+                        // If the row's TimeStamp is '--' or empty, hide the row
                         $row.hide();
                     }
                 });
@@ -109,16 +151,16 @@
                 // If no rows match, display an alert
                 if (!rowsFound) {
                     alert("No records available for the selected date.");
-                    refresh();
+                    //refresh(); // Call refresh function if needed
                 }
             });
-
         });
+
     </script>
 
 
 </head>
-<body class="container mt-1">
+<body class="mt-1 body-scrollbar">
     <h2>@Model.ReportName</h2>
 
     <!-- Search Section -->
@@ -146,8 +188,8 @@
 
             <!-- Right-aligned section for Date picker and Icon -->
             <div class="d-flex align-items-center ms-auto col-md-2 dateIcon">
-                <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date"> <br /> <br /> <br />
-                <button type="submit" class="headerbtndiv btn ms-0 small-btn refBtn" title="First Load Data" id="" onclick="refresh()">
+                <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date">
+                <button type="submit" class="headerbtndiv btn md-0 small-btn refBtn" title="First Load Data" id="" onclick="refresh()">
                     <i class="fas fa-retweet"></i>
                 </button>
             </div>
@@ -214,10 +256,10 @@
         <div class="row searchBarFilterData">
             @foreach (var column in Model.isFilterCol as List<string>)
             {
-                var columnId = column.Replace(" ", ""); 
+                var columnId = column.Replace(" ", "");
                 var uniqueValues = Model.TableData
                 .Where(data => data.ContainsKey(column))
-                .Select(data => data[column]?.ToString()) 
+                .Select(data => data[column]?.ToString())
                 .Distinct()
                 .ToList();
 
@@ -236,18 +278,18 @@
 
     <!-- Filter Section with Search Bar and Dropdown -->
     @* <div class="filter-section row g-3 mb-1 mt-1 filterSearchBar">
-        <div class="col-md-6">
-            <select id="filterColumn" class="form-select">
-                <option value="">-- Select Column --</option>
-                @foreach (var field in Model.FieldNames)
-                {
-                    <option value="@field">@field</option>
-                }
-            </select>
-        </div>
-        <div class="col-md-6">
-            <input type="text" id="textSearchTable" class="form-control" placeholder="Search..." onkeyup="TableDataFilter()">
-        </div>
+    <div class="col-md-6">
+    <select id="filterColumn" class="form-select">
+    <option value="">-- Select Column --</option>
+    @foreach (var field in Model.FieldNames)
+    {
+    <option value="@field">@field</option>
+    }
+    </select>
+    </div>
+    <div class="col-md-6">
+    <input type="text" id="textSearchTable" class="form-control" placeholder="Search..." onkeyup="TableDataFilter()">
+    </div>
     </div> *@
 
     @* Mobile Dropdown *@
@@ -267,8 +309,9 @@
     </div>
 
     <!-- Data Table -->
+    <div class="table-wrapper">
     <div class="table-container">
-        <table id="dataTable" class="table table-striped table-bordered">
+        <table id="dataTable" class="table table-striped">
             <thead class="table-dark">
                 <tr class="firstRowAlphabet">
                     @foreach (var column in Model.firstRowColumn)
@@ -279,20 +322,24 @@
                 <tr>
                     @foreach (var field in orderedColumns)
                     {
-                        <th>@field</th>
+                        var isFixed = fixedColumns.Contains(field); // Check if the column is fixed
+                        var className = isFixed ? "fixed-column" : "non-fixed-column"; // Assign class based on fixed column
+                        <th class="@className">@field</th>
                     }
                 </tr>
+
             </thead>
             <tbody>
                 @foreach (var row in Model.TotalSum)
                 {
                     <tr id="grandTotalRow">
-                        @foreach (var field in orderedColumns)
+                        @foreach (var field in orderedColumns.Select((column, index) => new { column, index }))
                         {
-                            <td data-column="@field">
-                                @if (row.ContainsKey(field))
+                            <td data-column="@field.column">
+                                @if (row.ContainsKey(field.column))
                                 {
-                                    var value = row[field];
+                                    var value = row[field.column];
+
                                     if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
                                     {
                                         @Convert.ToInt32(decimalValue)
@@ -304,15 +351,19 @@
                                     else
                                     {
                                         @value
-
                                     }
+                                }
+                                else if (field.index == 3)
+                                { // Index 3 means it's the 4th column (0-based index)
+                                    @("Grand Total")
                                 }
                                 else
                                 {
-                                    @("--") 
+                                    @("--")
                                 }
                             </td>
                         }
+
                     </tr>
                 }
 
@@ -351,6 +402,8 @@
             </tbody>
         </table>
     </div>
+    </div>
+
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {

@@ -202,6 +202,13 @@ public class DbService
             using (SqlCommand cmd = new SqlCommand(storedProcName, conn))
             {
                 cmd.CommandType = CommandType.StoredProcedure;
+
+                if (storedProcName.Equals("GETMTDEmployee", StringComparison.OrdinalIgnoreCase))
+                {
+                    cmd.Parameters.Add(new SqlParameter("@userID", SqlDbType.Int) { Value = 1 });
+                    cmd.Parameters.Add(new SqlParameter("@date", SqlDbType.Date) { Value = DBNull.Value });
+                }
+
                 await conn.OpenAsync();
                 using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                 {
@@ -332,7 +339,14 @@ public class DbService
                     }
                     else
                     {
-                        cmd.Parameters.AddWithValue(param, DBNull.Value); 
+                        if (storedProcName == "GetFct_EmployeeNumberTotal")
+                        {
+                            var defaultDate = new DateTime(2024, 12, 3);
+                            cmd.Parameters.AddWithValue(param, defaultDate);
+                        }
+                        else { 
+                        cmd.Parameters.AddWithValue(param, DBNull.Value);
+                        }
                     }
                 }
                 using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
@@ -373,5 +387,65 @@ public class DbService
             return (resultSet1, resultSet2, resultSet3, resultSet4, resultSet5);
         }
     }
+
+    //public async Task<DataTable> ExecuteStoredProcedureAsync(string storedProcName, DataRow row)
+    //{
+    //    DataTable dt = new DataTable();
+
+    //    try
+    //    {
+    //        using (SqlConnection conn = new SqlConnection(_connectionString))
+    //        {
+    //            await conn.OpenAsync();
+    //            using (SqlCommand cmd = new SqlCommand(storedProcName, conn))
+    //            {
+    //                cmd.CommandType = CommandType.StoredProcedure;
+
+    //                // Add dynamic parameters based on row values
+    //                foreach (DataColumn column in row.Table.Columns)
+    //                {
+    //                    cmd.Parameters.AddWithValue($"@{column.ColumnName}", row[column]);
+    //                }
+
+    //                using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+    //                {
+    //                    da.Fill(dt);
+    //                }
+    //            }
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        Console.WriteLine(ex.Message);
+    //    }
+
+    //    return dt;
+    //}
+    public async Task<List<Dictionary<string, object>>> ExecuteStoredProcedureAsync(string storedProcName)
+    {
+        var resultList = new List<Dictionary<string, object>>();
+        using (SqlConnection conn = new SqlConnection(_connectionString))
+        {
+            using (SqlCommand cmd = new SqlCommand(storedProcName, conn))
+            {
+                cmd.CommandType = CommandType.StoredProcedure;
+                await conn.OpenAsync();
+                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                {
+                    while (await reader.ReadAsync())
+                    {
+                        var row = new Dictionary<string, object>();
+                        for (int i = 0; i < reader.FieldCount; i++)
+                        {
+                            row[reader.GetName(i)] = reader[i];
+                        }
+                        resultList.Add(row);
+                    }
+                }
+            }
+        }
+        return resultList;
+    }
+
 }
 

@@ -9,6 +9,11 @@ namespace DynamicView.Models
         public List<string> isSubTotalCol { get; set; }
         public List<Dictionary<string, object>> TableData { get; set; }
         public List<Dictionary<string, object>> TotalSum { get; set; }
+        public List<Dictionary<string, object>> SubTotalResults { get; set; }
+        public List<Dictionary<string, object>> TotalMMM { get; set; }
+        public List<Dictionary<string, object>> TotalTM { get; set; }
+        
+        //public List<string> SubTotalResults { get; set; }
         public List<List<Dictionary<string, object>>> GetDynamicReport { get; set; }
 
 
