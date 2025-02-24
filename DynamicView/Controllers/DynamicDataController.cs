@@ -11,7 +11,7 @@ public class DynamicDataController : Controller
         _dbService = dbService;
     }
 
-    public async Task<IActionResult> Index(int reportId = 2)
+    public async Task<IActionResult> Index(int reportId = 1)
     {
         DynamicDataModel model = new DynamicDataModel();
 
@@ -77,19 +77,19 @@ public class DynamicDataController : Controller
             }
 
             if (secondTable != null) { 
-                model.FieldNames = secondTable.Columns.Contains("AttributeName") ? secondTable.AsEnumerable().Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                model.FieldNames = secondTable.Columns.Contains("Alias") ? secondTable.AsEnumerable().Select(row => row["Alias"]?.ToString().Trim('[', ']'))
                                  .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
 
                 model.isFixedCol = secondTable.AsEnumerable()
-                                                .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                                                .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
                                                 .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
 
                 model.isFilterCol = secondTable.AsEnumerable()
-                                                .Where(row => row.Field<bool?>("isFilter") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                                                .Where(row => row.Field<bool?>("isFilter") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
                                                 .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
 
                 model.isSubTotalCol = secondTable.AsEnumerable()
-                                                .Where(row => row.Field<bool?>("isSubTotal") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                                                .Where(row => row.Field<bool?>("isSubTotal") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
                                                 .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
             }
 
