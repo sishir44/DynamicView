@@ -11,7 +11,7 @@ public class DynamicDataController : Controller
         _dbService = dbService;
     }
 
-    public async Task<IActionResult> Index(int reportId = 1)
+    public async Task<IActionResult> Index(int reportId = 2)
     {
         DynamicDataModel model = new DynamicDataModel();
 
@@ -51,6 +51,7 @@ public class DynamicDataController : Controller
             if (firstRow != null)
             {
                 model.ReportName = firstRow["RepName"]?.ToString();
+                model.Color = firstRow["ColorCode"]?.ToString();
 
                 if (firstRow.Table.Columns.Contains("DataProc"))
                 {

@@ -30,6 +30,7 @@ namespace DynamicView.Models
         public int FemaleCount { get; set; }
 
         public string ReportName { get; set; }
+        public string Color { get; set; }
 
 
 

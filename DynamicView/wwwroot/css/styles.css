@@ -4,18 +4,25 @@
 .body-scrollbar {
     max-width: 100%;
     overflow-x: auto; /* horizontal scrolling */
-    margin-top: 50px;
+    /*margin-top: 50px;*/
     overflow-y: auto; /* vertical scrolling */
+}
+.firstbodyContent {
+    background-color: white;
+    font-size: 8px;
+    white-space: nowrap;
+    position:center !important;
 }
 
 /*.table-container {
     max-width: 100%;
-    overflow-x: auto;*/  /*Enable horizontal scrolling*/ 
-    /*white-space: nowrap; 
+    overflow-x: auto; Enable horizontal scrolling
+    white-space: nowrap; 
     margin-top: 50px;
     padding: 0 10px; 
     background-color: white;
 }*/
+
 
 /* Table Styling */
 table {
@@ -25,13 +32,23 @@ table {
     border-collapse: separate;
 }
 
+th {
+    vertical-align:middle;
+    text-align:center;
+    height:auto;
+}
+
 th, td {
     position: sticky;
     left: 0;
-    background: black; 
-    z-index: 2; 
-    white-space: normal; 
+    background: black;
+    z-index: 2;
+    white-space: normal;
     word-wrap: break-word;
+}
+
+tbody, tr, td {
+    width:auto;
 }
 
 .non-fixed-column {
@@ -49,7 +66,7 @@ th, td {
 }
 
 .filterSearchBar {
-    display:none;
+    display: none;
 }
 
 #selectedDate {
@@ -84,7 +101,6 @@ th, td {
 }
 
 .dateIcon {
-    
     /*border-radius: 10px;*/
     align-content: center;
     position: relative;
@@ -100,10 +116,10 @@ th, td {
         height: 30px;
     }
 
-    .firstRowAlphabet th {
-        background-color: #D3D3D3 !important;
-        padding: 3px !important;
-    }
+.firstRowAlphabet th {
+    background-color: #D3D3D3 !important;
+    padding: 3px !important;
+}
 
 
 /* new style for responsive*/
@@ -151,9 +167,11 @@ th, td {
         margin-top: 20px;
         overflow-x: auto;
     }
+
     .searchBarFilter {
         display: none;
     }
+
     .searchBarFilterData {
         display: none;
     }
@@ -214,11 +232,12 @@ th, td {
         margin-left: 0;
         margin-top: 5px;
     }
+
     .searchBarFilter {
         display: none;
     }
+
     .searchBarFilterData {
-        display:none;
+        display: none;
     }
 }
-                                                                              
