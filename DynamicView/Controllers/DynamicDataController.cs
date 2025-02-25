@@ -11,7 +11,7 @@ public class DynamicDataController : Controller
         _dbService = dbService;
     }
 
-    public async Task<IActionResult> Index(int reportId = 1)
+    public async Task<IActionResult> Index(int reportId = 2)
     {
         DynamicDataModel model = new DynamicDataModel();
 

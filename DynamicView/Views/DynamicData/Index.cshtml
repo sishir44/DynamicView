@@ -113,6 +113,7 @@
     <script>
         $(document).ready(function () {
             $("#selectedDate").on("change", function () {
+
                 let selectedDate = $(this).val();
 
                 if (!selectedDate) {
@@ -126,32 +127,38 @@
                 }
 
                 let rowsFound = false;
-
                 $("#dataTable tbody tr").each(function () {
                     let $row = $(this);
-                    let rowDate = $row.find("[data-column='TimeStamp']").text().trim();
+                    
+                    let timeStamp = $row.find("[data-column='TimeStamp']").text().trim();
+                    let dateKey = $row.find("[data-column='DateKey']").text().trim();
+                    let formattedTimeStampDate = "";
+                    let formattedDateKeyDate = "";
 
-                    if (rowDate && rowDate !== '--') {
-                        let datePart = rowDate.split(" ")[0];
-                        //let formattedRowDate = rowDate.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
-                        let formattedRowDate = datePart.replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1");
-                        // Show row if it matches the selected date
-                        if (formattedRowDate === selectedDate) {
-                            $row.show();
-                            rowsFound = true;
-                        } else {
-                            $row.hide();
-                        }
+                    if (timeStamp && timeStamp !== '--') {
+                        let datePart = timeStamp.split(" ")[0]; 
+                        formattedTimeStampDate = datePart.replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1"); 
+                    }
+
+                    if (dateKey && dateKey !== '--') {
+                        formattedDateKeyDate = dateKey.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
+                    }
+
+                    if (formattedTimeStampDate === selectedDate || formattedDateKeyDate === selectedDate) {
+                        $row.show();  
+                        rowsFound = true;
                     } else {
-                        // If the row's TimeStamp is '--' or empty, hide the row
-                        $row.hide();
+                        $row.hide();  
+                    }
+
+                    if ((!formattedTimeStampDate || formattedTimeStampDate === '--') && (!formattedDateKeyDate || formattedDateKeyDate === '--')) {
+                        $row.hide();  
                     }
                 });
 
-                // If no rows match, display an alert
                 if (!rowsFound) {
                     alert("No records available for the selected date.");
-                    //refresh(); // Call refresh function if needed
+                    //refresh(); 
                 }
             });
         });
@@ -418,14 +425,14 @@
                                         @value
                                     }
                                     else if (field.index == 0)
-                                    { 
+                                    {
                                         @("MMM Total")
                                     }
                                     else
                                     {
                                         @("")
                                     }
-                                </td>  
+                                </td>
                             }
                         </tr>
 
@@ -435,9 +442,9 @@
                                 @foreach (var field in orderedColumns.Select((column, index) => new { column, index }))
                                 {
                                     <td data-column="@field.column">
-                                        @if (Model.TotalTM[i].ContainsKey(field.column))
+                                        @if (Model.TotalTM[j].ContainsKey(field.column))
                                         {
-                                            var value = Model.TotalTM[i][field.column];
+                                            var value = Model.TotalTM[j][field.column];
                                             @value
                                         }
                                         else if (field.index == 0)
@@ -446,16 +453,15 @@
                                         }
                                         else
                                         {
-                                            @("")
+                                            @(" ")
                                         }
-
                                     </td>
                                 }
-                            
                             </tr>
 
-                            <!-- Loop through TableData and display the related data -->
-                            foreach (var row in Model.TableData.Where(r => r.ContainsKey("TM") && !string.IsNullOrEmpty(r["TM"]?.ToString())))
+                            <!-- Loop through TableData and display the related data, matching TM and MMM values -->
+                            foreach (var row in Model.TableData.Where(r => r.ContainsKey("TM") && !string.IsNullOrEmpty(r["TM"]?.ToString()) && r.ContainsKey("MUL_MktMngr") && !string.IsNullOrEmpty(r["MUL_MktMngr"]?.ToString()) &&
+                                                                            r["TM"].ToString() == Model.TotalTM[j]["TM"]?.ToString() && r["MUL_MktMngr"].ToString() == Model.TotalMMM[i]["MUL_MktMngr"]?.ToString()))
                             {
                                 <tr>
                                     @foreach (var field in orderedColumns)
@@ -487,6 +493,7 @@
                             }
                         }
                     }
+
                 } 
                 else
                 {
