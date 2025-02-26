@@ -5,6 +5,7 @@ namespace DynamicView.Models
     {
         public List<string> FieldNames { get; set; }
         public List<string> isFixedCol { get; set; }
+        public List<string> isFixedM { get; set; }
         public List<string> isFilterCol { get; set; }
         public List<string> isSubTotalCol { get; set; }
         public List<Dictionary<string, object>> TableData { get; set; }
@@ -31,6 +32,7 @@ namespace DynamicView.Models
 
         public string ReportName { get; set; }
         public string Color { get; set; }
+        public string AlternateRowColor { get; set; }
 
 
 

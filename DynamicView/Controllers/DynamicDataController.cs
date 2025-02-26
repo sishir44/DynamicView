@@ -52,6 +52,7 @@ public class DynamicDataController : Controller
             {
                 model.ReportName = firstRow["RepName"]?.ToString();
                 model.Color = firstRow["ColorCode"]?.ToString();
+                model.AlternateRowColor = firstRow["AlternateRowColor"]?.ToString();
 
                 if (firstRow.Table.Columns.Contains("DataProc"))
                 {
@@ -82,6 +83,10 @@ public class DynamicDataController : Controller
 
                 model.isFixedCol = secondTable.AsEnumerable()
                                                 .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                                .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
+
+                model.isFixedM = secondTable.AsEnumerable()
+                                                .Where(row => row.Field<bool?>("isFixedM") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
                                                 .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
 
                 model.isFilterCol = secondTable.AsEnumerable()

@@ -51,10 +51,11 @@ tbody, tr, td {
     width:auto;
 }
 
-.non-fixed-column {
-    background-color: #063B73 !important;
+/*.non-fixed-column {*/
+    /*background-color: #063B73 !important;*/
+    /*background-color: @Model.Color !important;
     color: white;
-}
+}*/
 
 .optionfilter {
     font-size: 10px;
@@ -126,6 +127,11 @@ tbody, tr, td {
 
 /* Mobile and tablet responsive adjustments */
 @media (max-width: 768px) {
+
+    header {
+        width:100%;
+    }
+
     .table-container {
         margin-top: 30px;
     }
@@ -150,6 +156,7 @@ tbody, tr, td {
     #selectedDate {
         font-size: 10px;
         width: 100px;
+        margin-right:-5px;
     }
 
     /* Align the header and filter button on mobile */
@@ -160,6 +167,7 @@ tbody, tr, td {
 
     .dateIcon {
         margin-top: 5px;
+        margin-right:-10px;
     }
 
     /* Ensure the table doesn't overflow and stays scrollable */
@@ -175,10 +183,11 @@ tbody, tr, td {
     .searchBarFilterData {
         display: none;
     }
+ 
 }
 
 /* Large screens and desktop */
-@media (min-width: 1024px) {
+/*@media (min-width: 1024px) {
     th, td {
         padding: 12px;
         font-size: 14px;
@@ -197,7 +206,7 @@ tbody, tr, td {
     .dateIcon {
         margin-top: 10px;
     }
-}
+}*/
 
 /* Small screens (Mobile) */
 @media (max-width: 480px) {

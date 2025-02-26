@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@model DynamicView.Models.DynamicDataModel
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -12,7 +14,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <header>
+    @* <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="DynamicData" asp-action="Index">DynamicView</a>
@@ -20,7 +22,7 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                @* <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
@@ -32,20 +34,35 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="DynamicData" asp-action="Index">Dynamic View</a>
                         </li>
                     </ul>
-                </div> *@
+                </div>
 
                 <!-- Right-aligned section for Date picker and Icon -->
-                @* <div class="d-flex align-items-center ms-auto">
+                <div class="d-flex align-items-center ms-auto">
                     <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date" onchange="dateFilterTable()">
                     <button type="submit" class="headerbtndiv btn ms-2 small-btn" title="First Load Data" id="" onclick="refresh()">
                         <i class="fas fa-retweet"></i>
                     </button>
-                </div> *@
+                </div>
+            </div>
+        </nav>
+    </header> *@
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm" style="color: black; background-color:@Model.Color;">
+            <div class="container-fluid">
+                <h2 id="reportHeader">@Model.ReportName</h2>
+                <!-- Add ms-auto to push the items to the right -->
+                <div class="d-flex ms-auto align-items-center col-md-2">
+                    <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date">
+                    <button type="submit" class="btn btn-sm ms-2 small-btn refBtn" title="First Load Data" onclick="refresh()">
+                        <i class="fas fa-retweet"></i>
+                    </button>
+                </div>
             </div>
         </nav>
     </header>
 
-    <div class="">
+
+    <div class="mt-0">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
