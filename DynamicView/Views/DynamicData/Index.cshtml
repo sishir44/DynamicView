@@ -49,7 +49,13 @@
             border-right: 1px solid white;
             left: 0px;
             z-index: 10;
+            display: table-cell;
         }
+
+        .fixed-column-mobile {
+            display: none;
+        }
+
         .odd-row {
             background-color: @Model.AlternateRowColor !important;
         }
@@ -358,8 +364,9 @@
                         var isFixed = fixedColumns.Contains(field); // Check if the column is fixed
                         var isMobileFix = isFixedM.Contains(field);
                         var className = isFixed ? "fixed-column" : "non-fixed-column";
-                        //var mobileClass = isMobileFix ? "mobile-fixed" : "non-fixed-column";
+                        //var mobileClass = isMobileFix ? "fixed-column-mobile" : "non-fixed-column-mobile";
                         <th class="@className">@field</th>
+                        
                     }
                 </tr>
 
