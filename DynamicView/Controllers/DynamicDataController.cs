@@ -18,20 +18,16 @@ public class DynamicDataController : Controller
         try
         {
             //model.FieldNames = await _dbService.GetFieldNamesAsync(reportId);
-
             // model.GetDynamicReport = await _dbService.GetDynamicReportAsync(reportId);
-
             //if (model.GetDynamicReport?.Count > 0)
             //{
             //    var firstRow = model.GetDynamicReport[0]?.FirstOrDefault();
             //    var secondRow = model.GetDynamicReport[1]?.FirstOrDefault();
-
             //    model.ReportName = firstRow["RepName"]?.ToString();
             //    var storedProcName = firstRow["DataProc"]?.ToString();
             //    model.TableData = await _dbService.DataAsync(storedProcName);
             //    var totalCountProc = firstRow["GrandTotalProc"]?.ToString();
             //    model.TotalSum = await _dbService.TotalAsync(totalCountProc);
-
             //    model.FieldNames = model.GetDynamicReport[1]
             //                        .Select(row => row["AttributeName"].ToString().Trim('[', ']')).ToList();
             //    model.isFixedCol = model.GetDynamicReport[1]

@@ -59,10 +59,68 @@
                 </div>
             </div>
         </nav>
+
+        <div class="row filterClass">
+            <div class="row mt-1 searchBarFilter">
+                <div class="row">
+                    @foreach (var column in Model.isFilterCol as List<string>)
+                    {
+                        var columnId = column.Replace(" ", ""); // Remove spaces to create valid IDs
+                        <div class="col-md-2">
+                            <input type="text"
+                                   name="textSearch@columnId"
+                                   id="textSearch@columnId"
+                                   class="selectorinput form-control"
+                                   placeholder="Search @column..."
+                                   data-column="@columnId" />
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="row searchBarFilterData">
+                @foreach (var column in Model.isFilterCol as List<string>)
+                {
+                    var columnId = column.Replace(" ", "");
+                    var uniqueValues = Model.TableData
+                    .Where(data => data.ContainsKey(column))
+                    .Select(data => data[column]?.ToString())
+                    .Distinct()
+                    .ToList();
+
+                    <div class="col-md-2">
+                        <select class="form-control filter-dropdown mt-2" id="dropdown_@columnId" size="5" data-column="@columnId">
+                            @foreach (var value in uniqueValues)
+                            {
+                                <option class="optionfilter" style="background-color: @Model.Color;" value="@value" title="@value">@value</option>
+                            }
+                        </select>
+                    </div>
+                }
+            </div>
+        </div>
+
+        @* Mobile Dropdown *@
+        <div class="filter-section row g-3 mt-3 filterSearchBar">
+            <div class="col-md-6">
+                <select id="filterColumn" class="form-select">
+                    <option value="">-- Select Column --</option>
+                    @foreach (var column in Model.isFilterCol)
+                    {
+                        <option value="@column">@column</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-6">
+                <input type="text" id="textSearchTable" class="form-control" placeholder="Search..." onkeyup="TableDataFilter()">
+            </div>
+        </div>
     </header>
 
+    
 
-    <div class="mt-0">
+
+    <div class="mainClass">
         <main role="main" class="pb-3">
             @RenderBody()
         </main>

@@ -1,5 +1,4 @@
 ﻿
-
 /* Enable horizontal scrolling */
 .body-scrollbar {
     max-width: 100%;
@@ -7,11 +6,21 @@
     /*margin-top: 50px;*/
     overflow-y: auto; /* vertical scrolling */
 }
-.firstbodyContent {
+/*.firstbodyContent {
     background-color: white;
     font-size: 8px;
     white-space: nowrap;
     position:center !important;
+}*/
+
+.filterClass {
+    background-color:white !important;
+}
+
+.searchBarFilter .col-md-2,
+.searchBarFilterData .col-md-2 {
+    padding: 5px;
+    margin-left: 15px;
 }
 
 /*.table-container {
@@ -22,8 +31,9 @@
     padding: 0 10px; 
     background-color: white;
 }*/
+
 #reportHeader {
-    font-size:20px;
+    font-size: 20px;
 }
 /* Table Styling */
 table {
@@ -31,6 +41,7 @@ table {
     table-layout: auto; /* Allow columns to adjust width dynamically */
     /* border-collapse: collapse; */
     border-collapse: separate;
+    margin-top: 135px;
 }
 
 th {
@@ -116,55 +127,63 @@ tbody, tr, td {
     font-size: 14px;
 }
 
-    .dateIcon .refBtn {
-        background-color: #A5CFF0;
-        height: 30px;
-    }
+.dateIcon .refBtn {
+    background-color: #A5CFF0;
+    height: 30px;
+}
 
 .firstRowAlphabet th {
     background-color: #D3D3D3 !important;
-    padding: 3px !important;
+    /*padding: 3px !important;*/
 }
+
+/*.fixed-column-mobile {
+    display: none;
+}*/
 
 
 /* new style for responsive*/
 
 /* Mobile and tablet responsive adjustments */
-@media (max-width: 768px) {
+/*@media (max-width: 768px) {
+
+    .fixed-column {
+        position:relative;
+    }
 
     header {
-        width:100%;
+        width: 100%;
     }
 
     .table-container {
         margin-top: 30px;
-    }
+    }*/
 
     /* Adjust the font size for mobile/tablet */
-    th, td {
+    /*th, td {
         padding: 8px;
         font-size: 12px;
-    }
+    }*/
 
     /* Make the dropdowns smaller on mobile */
-    .filter-dropdown {
+    /*.filter-dropdown {
         font-size: 12px;
-    }
+    }*/
 
     /* Hide the search bar on mobile */
-    .filterSearchBar {
+    /*.filterSearchBar {
         display: block;
-    }
+    }*/
 
     /* Adjust date picker */
-    #selectedDate {
+    /*#selectedDate {
         font-size: 10px;
         width: 100px;
         margin-right:-5px;
-    }
+    }*/
 
     /* Align the header and filter button on mobile */
-    .ms-auto {
+    /*.ms-auto {
         margin-left: 0;
         margin-top: 5px;
     }
@@ -172,10 +191,10 @@ tbody, tr, td {
     .dateIcon {
         margin-top: 5px;
         margin-right:-10px;
-    }
+    }*/
 
     /* Ensure the table doesn't overflow and stays scrollable */
-    .table-container {
+    /*.table-container {
         margin-top: 20px;
         overflow-x: auto;
     }
@@ -189,19 +208,23 @@ tbody, tr, td {
     }
 
     .fixed-column {
-        display: none; /* Hide fixed columns on mobile */
-    }
+        display: none;*/ /* Hide fixed columns on mobile */
+    /*}
 
     .fixed-column-mobile {
-        display: table-cell; /* Show fixed column on mobile */
-    }
+        display: table-cell;*/ /* Show fixed column on mobile */
+    /*}
  
 }
+
 @media (min-width: 768px) {
     .non-fixed-column-mobile {
-        display: none; /* Hide non-fixed mobile column on larger screens */
+        display: none;*/ /* Hide non-fixed mobile column on larger screens */
+    /*}
+    .fixed-column {
+        position: relative;
     }
-}
+}*/
 
 /* Large screens and desktop */
 /*@media (min-width: 1024px) {
@@ -226,24 +249,29 @@ tbody, tr, td {
 }*/
 
 /* Small screens (Mobile) */
-@media (max-width: 480px) {
+/*@media (max-width: 480px) {
+
+    .fixed-column {
+        position: relative;
+    }
+
     th, td {
-        font-size: 10px; /* Smaller font size for mobile */
-        padding: 5px;
+        font-size: 10px;*/ /* Smaller font size for mobile */
+        /*padding: 5px;
     }
 
     #selectedDate {
         font-size: 9px;
         width: 90px;
-    }
+    }*/
 
     /* Make dropdown and filter elements more compact */
-    .filter-dropdown {
+    /*.filter-dropdown {
         font-size: 9px;
-    }
+    }*/
 
     /* Adjust button size on smaller devices */
-    .headerbtndiv {
+    /*.headerbtndiv {
         width: 35px;
         height: 35px;
     }
@@ -268,10 +296,152 @@ tbody, tr, td {
     }
 
     .fixed-column {
-        display: none; /* Hide fixed columns on mobile */
-    }
+        display: none;*/ /* Hide fixed columns on mobile */
+    /*}
 
     .fixed-column-mobile {
-        display: table-cell; /* Show fixed column on mobile */
+        display: table-cell;*/ /* Show fixed column on mobile */
+    /*}
+}*/
+
+
+/* Mobile and tablet responsive adjustments */
+@media (min-width: 768px) {
+    .non-fixed-column-mobile {
+        display: none; /* Hide non-fixed mobile column on larger screens */
+    }
+
+    .fixed-column {
+        position: relative;
     }
 }
+
+@media (max-width: 768px) {
+
+    /* Disable sticky behavior and allow scrolling for both fixed and non-fixed columns */
+    .fixed-column {
+        position: relative !important; /* Disable sticky */
+        left: auto; /* Disable left positioning */
+        z-index: 1; /* Set lower z-index for mobile view */
+    }
+
+    /* Ensure the table is horizontally scrollable on mobile */
+    .table-container {
+        margin-top: 30px;
+        overflow-x: auto; /* Make the table horizontally scrollable */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling for touch devices */
+    }
+
+    /* Make the table header and cells nowrap (no word wrapping) */
+    .table th,
+    .table td {
+        white-space: nowrap; /* Prevent text wrapping in table cells */
+    }
+
+    /* Adjust font size for mobile */
+    th, td {
+        padding: 8px;
+        font-size: 12px; /* Smaller font size on mobile */
+    }
+
+    /* Adjust search and filter bar for mobile */
+    .filter-dropdown {
+        font-size: 12px;
+    }
+
+    .filterSearchBar {
+        display: block;
+    }
+
+    #selectedDate {
+        font-size: 10px;
+        width: 100px;
+        margin-right: -5px;
+    }
+
+    .ms-auto {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+
+    .dateIcon {
+        margin-top: 5px;
+        margin-right: -10px;
+    }
+
+    .searchBarFilter, .searchBarFilterData {
+        display: none;
+    }
+
+    /* Ensure full width of the table */
+    header {
+        width: 100%;
+    }
+
+    /* Make the table container responsive */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Adjust the header of the table on mobile */
+    .table-dark {
+        font-size: 14px; /* Slightly smaller font for header on mobile */
+    }
+}
+
+/* Mobile (very small screens) adjustments */
+@media (max-width: 480px) {
+    .fixed-column {
+        position: relative;
+    }
+    /* Adjust font size for mobile */
+    th, td {
+        font-size: 10px; /* Smaller font size */
+        padding: 5px; /* Adjust padding for compact view */
+    }
+
+    #selectedDate {
+        font-size: 9px;
+        width: 90px;
+    }
+
+    /* Make dropdown and filter elements more compact */
+    .filter-dropdown {
+        font-size: 9px;
+    }
+
+    /* Adjust the button size for small devices */
+    .headerbtndiv {
+        width: 35px;
+        height: 35px;
+    }
+
+    .dateIcon {
+        width: 100%;
+        padding: 5px;
+        text-align: center;
+    }
+
+    .ms-auto {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+
+    /* Ensure the table container scroll is smooth on very small devices */
+    .table-container {
+        margin-top: 20px;
+    }
+
+    /* Make sure search and filter options fit in small screens */
+    .filterSearchBar {
+        width: 100%;
+        font-size: 10px;
+    }
+
+    /* Remove unnecessary margins and padding on small screens */
+    .searchBarFilter, .searchBarFilterData {
+        display: none;
+    }
+}
+
