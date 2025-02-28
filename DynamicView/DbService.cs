@@ -366,7 +366,7 @@ public class DbService
         }
         return resultList;
     }
-    public (List<DataTable> resultSet1, List<DataTable> resultSet2, List<DataTable> resultSet3, List<DataTable> resultSet4, List<DataTable> resultSet5) GetDynamicReportNew(int reportID)
+    public (List<DataTable> resultSet1, List<DataTable> resultSet2, List<DataTable> resultSet3, List<DataTable> resultSet4, List<DataTable> resultSet5, List<DataTable> resultSet6) GetDynamicReportNew(int reportID)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -383,8 +383,9 @@ public class DbService
             List<DataTable> resultSet3 = new List<DataTable> { dataSet.Tables[2] };
             List<DataTable> resultSet4 = new List<DataTable> { dataSet.Tables[3] };
             List<DataTable> resultSet5 = new List<DataTable> { dataSet.Tables[4] };
+            List<DataTable> resultSet6 = new List<DataTable> { dataSet.Tables[5] };
 
-            return (resultSet1, resultSet2, resultSet3, resultSet4, resultSet5);
+            return (resultSet1, resultSet2, resultSet3, resultSet4, resultSet5, resultSet6);
         }
     }
 

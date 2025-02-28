@@ -12,39 +12,45 @@
     <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+
+    <script>
+        
+        </script>
+
+
 </head>
 <body>
     @* <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="DynamicData" asp-action="Index">DynamicView</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="DynamicData" asp-action="Index">Dynamic View</a>
-                        </li>
-                    </ul>
-                </div>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white3">
+    <div class="container-fluid">
+    <a class="navbar-brand" asp-area="" asp-controller="DynamicData" asp-action="Index">DynamicView</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+    aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+    <ul class="navbar-nav flex-grow-1">
+    <li class="nav-item">
+    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </li>
+    <li class="nav-item">
+    <a class="nav-link text-dark" asp-area="" asp-controller="DynamicData" asp-action="Index">Dynamic View</a>
+    </li>
+    </ul>
+    </div>
 
-                <!-- Right-aligned section for Date picker and Icon -->
-                <div class="d-flex align-items-center ms-auto">
-                    <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date" onchange="dateFilterTable()">
-                    <button type="submit" class="headerbtndiv btn ms-2 small-btn" title="First Load Data" id="" onclick="refresh()">
-                        <i class="fas fa-retweet"></i>
-                    </button>
-                </div>
-            </div>
-        </nav>
+    <!-- Right-aligned section for Date picker and Icon -->
+    <div class="d-flex align-items-center ms-auto">
+    <input type="date" id="selectedDate" name="selectedDate" class="form-control" title="Select Date" onchange="dateFilterTable()">
+    <button type="submit" class="headerbtndiv btn ms-2 small-btn" title="First Load Data" id="" onclick="refresh()">
+    <i class="fas fa-retweet"></i>
+    </button>
+    </div>
+    </div>
+    </nav>
     </header> *@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm" style="color: black; background-color:@Model.Color;">
@@ -101,23 +107,25 @@
         </div>
 
         @* Mobile Dropdown *@
-        <div class="filter-section row g-3 mt-3 filterSearchBar">
-            <div class="col-md-6">
-                <select id="filterColumn" class="form-select">
-                    <option value="">-- Select Column --</option>
-                    @foreach (var column in Model.isFilterCol)
-                    {
-                        <option value="@column">@column</option>
-                    }
-                </select>
-            </div>
-            <div class="col-md-6">
-                <input type="text" id="textSearchTable" class="form-control" placeholder="Search..." onkeyup="TableDataFilter()">
+        <div class="container dropdownSearchBar">
+            <div class="filter-section row g-3 mt-0 filterSearchBar">
+                <div class="col-md-6">
+                    <select id="filterColumn" class="form-select">
+                        <option value="">-- Select Column --</option>
+                        @foreach (var column in Model.isFilterCol)
+                        {
+                            <option value="@column">@column</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <input type="text" id="textSearchTable" class="form-control" placeholder="Search..." onkeyup="TableDataFilter()">
+                </div>
             </div>
         </div>
     </header>
 
-    
+
 
 
     <div class="mainClass">
@@ -128,9 +136,9 @@
 
 
     @* <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - DynamicView - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
+    <div class="container">
+    &copy; 2025 - DynamicView - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
     </footer> *@
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

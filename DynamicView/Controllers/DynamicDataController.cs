@@ -1,6 +1,7 @@
 ﻿using DynamicView.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
+using System.Linq;
 
 public class DynamicDataController : Controller
 {
@@ -13,6 +14,8 @@ public class DynamicDataController : Controller
 
     public async Task<IActionResult> Index(int reportId = 2)
     {
+        bool isMobile = IsMobileRequest(HttpContext);
+        
         DynamicDataModel model = new DynamicDataModel();
 
         try
@@ -39,11 +42,15 @@ public class DynamicDataController : Controller
             //}
 
             var result = _dbService.GetDynamicReportNew(reportId);
-            var firstTable = result.resultSet1[0];
-            var secondTable = result.resultSet2[0];
-            var fifthTable = result.resultSet5[0];
+            var firstTable = result.resultSet1[0]; // data col header and color
+            var secondTable = result.resultSet2[0]; // alias name for col
+            var thirdTable = result.resultSet3[0]; // isFixed for Desktop
+            var fourthTable = result.resultSet4[0]; // is Fixed for Mobile
+            var fifthTable = result.resultSet5[0];  // isFilter
+            var sixthTable = result.resultSet6[0]; // subtotal
 
             var firstRow = firstTable?.Rows.Cast<DataRow>().FirstOrDefault();
+            // get col header, data and color
             if (firstRow != null)
             {
                 model.ReportName = firstRow["RepName"]?.ToString();
@@ -73,29 +80,50 @@ public class DynamicDataController : Controller
                 }
             }
 
-            if (secondTable != null) { 
+            // get the alias name for table
+            if (secondTable != null)
+            {
                 model.FieldNames = secondTable.Columns.Contains("Alias") ? secondTable.AsEnumerable().Select(row => row["Alias"]?.ToString().Trim('[', ']'))
-                                 .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
+                                  .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
+            }
 
-                model.isFixedCol = secondTable.AsEnumerable()
-                                                .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
-                                                .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
-
-                model.isFixedM = secondTable.AsEnumerable()
-                                                .Where(row => row.Field<bool?>("isFixedM") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
-                                                .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
-
-                model.isFilterCol = secondTable.AsEnumerable()
-                                                .Where(row => row.Field<bool?>("isFilter") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
-                                                .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
-
-                model.isSubTotalCol = secondTable.AsEnumerable()
-                                                .Where(row => row.Field<bool?>("isSubTotal") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
-                                                .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
+            if (!isMobile)
+            {
+                // get the fixed col for Desktop
+                if (thirdTable != null)
+                {
+                    model.isFixedCol = thirdTable.AsEnumerable()
+                                     .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                     .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
+                }
+            }
+            else
+            {
+                // get the fixed col for mobile
+                if (fourthTable != null)
+                {
+                    model.isFixedCol = fourthTable.AsEnumerable()
+                                     .Where(row => row.Field<bool?>("isFixedM") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                     .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
+                }
+            }
+            // get the filter 
+            if (fifthTable != null)
+            {
+                model.isFilterCol = fifthTable.AsEnumerable()
+                                 .Where(row => row.Field<bool?>("isFilter") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                 .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
+            }
+            // sub total
+            if (sixthTable != null)
+            {
+                model.isSubTotalCol = sixthTable.AsEnumerable()
+                                 .Where(row => row.Field<bool?>("isSubTotal") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                 .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
             }
 
 
-            if (fifthTable != null && fifthTable.Columns.Contains("SubTotalProc") && fifthTable.Rows.Count > 0)
+            if (sixthTable != null && sixthTable.Columns.Contains("SubTotalProc") && sixthTable.Rows.Count > 0)
             {
                 model.SubTotalResults = new List<Dictionary<string, object>>(); // ✅ Correct initialization
 
@@ -108,7 +136,7 @@ public class DynamicDataController : Controller
                         // Execute the stored procedure using Data Access Layer
                         var resultData = await _dbService.ExecuteStoredProcedureAsync(storedProcName);
 
-                        if(storedProcName == "GetFct_StoreNumberTotalMMM")
+                        if (storedProcName == "GetFct_StoreNumberTotalMMM")
                         {
                             model.TotalMMM = resultData;
                         }
@@ -159,5 +187,11 @@ public class DynamicDataController : Controller
             num /= 26;
         }
         return result;
+    }
+
+    public bool IsMobileRequest(HttpContext context)
+    {
+        var userAgent = context.Request.Headers["User-Agent"].ToString();
+        return userAgent.Contains("Mobi") || userAgent.Contains("Android") || userAgent.Contains("IPhone");
     }
 }
