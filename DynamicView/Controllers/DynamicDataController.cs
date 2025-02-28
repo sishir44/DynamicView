@@ -119,7 +119,7 @@ public class DynamicDataController : Controller
             if (sixthTable != null)
             {
                 model.isSubTotalCol = sixthTable.AsEnumerable()
-                                 .Where(row => row.Field<bool?>("isSubTotal") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                 .Where(row => row.Field<bool?>("isSubTotal") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
                                  .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
             }
 
@@ -128,7 +128,7 @@ public class DynamicDataController : Controller
             {
                 model.SubTotalResults = new List<Dictionary<string, object>>(); // ✅ Correct initialization
 
-                foreach (DataRow row in fifthTable.Rows)
+                foreach (DataRow row in sixthTable.Rows)
                 {
                     string storedProcName = row["SubTotalProc"]?.ToString();
 

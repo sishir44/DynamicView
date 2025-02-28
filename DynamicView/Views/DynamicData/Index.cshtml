@@ -173,34 +173,6 @@
         });
     </script>
 
-
-   @*  <script>
-        // Function to check and toggle views based on the window size
-        function adjustViewBasedOnWindowSize() {
-            var desktopView = document.querySelector('.DesktopView');
-            var mobileView = document.querySelector('.MobileView');
-
-            if (window.innerWidth <= 768) { // If screen width is less than or equal to 768px (mobile view)
-                desktopView.style.display = 'none';  // Hide desktop view
-                mobileView.style.display = 'table-row'; // Show mobile view
-            } else { // If screen width is larger (desktop view)
-                desktopView.style.display = 'table-row'; // Show desktop view
-                mobileView.style.display = 'none'; // Hide mobile view
-            }
-        }
-
-        // Ensure the function is called once the page is loaded
-        window.addEventListener('load', adjustViewBasedOnWindowSize);
-
-        // Ensure the function is called whenever the window is resized
-        window.addEventListener('resize', adjustViewBasedOnWindowSize);
-
-        // Optionally, you can also call the function when you manually change device in developer tools
-        window.addEventListener('orientationchange', adjustViewBasedOnWindowSize);
-    </script> *@
-
-
-
 </head>
 <body class="body-scrollbar">
 
@@ -414,9 +386,6 @@
                         rowIndex++;
                     }
                 }
-
-
-
             </tbody>
         </table>
     </div>
