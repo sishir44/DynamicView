@@ -77,9 +77,9 @@ tbody, tr, td {
     margin-bottom: 5px;
 }
 
-.filterSearchBar {
+.dropdownSearchBar {
     display: none;
-}
+}  
 
 #selectedDate {
     margin-top: 5px;
@@ -133,17 +133,11 @@ tbody, tr, td {
     /*padding: 3px !important;*/
 }
 
-.MobileView {
-    display: none;
-}
-
 /* Default Style Desktop View End*/
-
 
 
 /*Mobile View Start*/
 @media screen and (max-width: 768px) {
-
     header {
         position: fixed !important;
         top: 0;
@@ -162,6 +156,7 @@ tbody, tr, td {
     .dropdownSearchBar {
         width: 100%;
         margin-left: -2px;
+        display:block;
     }
 
     .fixed-column {
@@ -187,7 +182,7 @@ tbody, tr, td {
         font-size: 10px;
         display: block;
         margin-bottom: 10px;
-        background-color:cadetblue;
+        background-color:white;
     }
 
     #textSearchTable {
@@ -239,9 +234,9 @@ tbody, tr, td {
         width:100%;
     }
     .dropdownSearchBar {
-        width:100%;
-        margin-left:-2px;
-
+        width: 100%;
+        margin-left: -2px;
+        display: block;
     }
 
     .fixed-column {
@@ -290,7 +285,7 @@ tbody, tr, td {
         top:auto;
         background-color:white;
     }
-
+   
     /*#filterColumn, #textSearchTable {
         width: 50%;
         justify-content: center;
@@ -298,8 +293,8 @@ tbody, tr, td {
         margin-left: 30%;
         position: fixed !important;
     }*/
-    #textSearchTable{
-        margin-bottom:10px;
+    #textSearchTable {
+        margin-bottom: 10px;
     }
     /* Remove unnecessary margins and padding on small screens */
     .searchBarFilter, .searchBarFilterData {

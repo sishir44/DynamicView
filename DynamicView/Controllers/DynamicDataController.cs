@@ -14,9 +14,10 @@ public class DynamicDataController : Controller
 
     public async Task<IActionResult> Index(int reportId = 2)
     {
-        bool isMobile = IsMobileRequest(HttpContext);
-        
         DynamicDataModel model = new DynamicDataModel();
+
+        bool isMobile = IsMobileRequest(HttpContext);
+        model.isMobile = isMobile;
 
         try
         {

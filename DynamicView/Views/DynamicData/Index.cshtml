@@ -12,7 +12,7 @@
     var rowIndex = 0; // Track the row index for alternating colors
 
     //var isFixedM = Model.FieldNames.Where(field => Model.isFixedM.Contains(field)).ToList();
-                                
+
 }
 
 <!DOCTYPE html>
@@ -127,15 +127,15 @@
                 let rowsFound = false;
                 $("#dataTable tbody tr").each(function () {
                     let $row = $(this);
-                    
+
                     let timeStamp = $row.find("[data-column='TimeStamp']").text().trim();
                     let dateKey = $row.find("[data-column='DateKey']").text().trim();
                     let formattedTimeStampDate = "";
                     let formattedDateKeyDate = "";
 
                     if (timeStamp && timeStamp !== '--') {
-                        let datePart = timeStamp.split(" ")[0]; 
-                        formattedTimeStampDate = datePart.replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1"); 
+                        let datePart = timeStamp.split(" ")[0];
+                        formattedTimeStampDate = datePart.replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1");
                     }
 
                     if (dateKey && dateKey !== '--') {
@@ -143,20 +143,20 @@
                     }
 
                     if (formattedTimeStampDate === selectedDate || formattedDateKeyDate === selectedDate) {
-                        $row.show();  
+                        $row.show();
                         rowsFound = true;
                     } else {
-                        $row.hide();  
+                        $row.hide();
                     }
 
                     if ((!formattedTimeStampDate || formattedTimeStampDate === '--') && (!formattedDateKeyDate || formattedDateKeyDate === '--')) {
-                        $row.hide();  
+                        $row.hide();
                     }
                 });
 
                 if (!rowsFound) {
                     alert("No records available for the selected date.");
-                    //refresh(); 
+                    //refresh();
                 }
             });
         });
@@ -171,10 +171,35 @@
                 elements[i].style.setProperty('background-color', colorCode, 'important');
             }
         });
-</script>
+    </script>
 
-    
-    
+
+   @*  <script>
+        // Function to check and toggle views based on the window size
+        function adjustViewBasedOnWindowSize() {
+            var desktopView = document.querySelector('.DesktopView');
+            var mobileView = document.querySelector('.MobileView');
+
+            if (window.innerWidth <= 768) { // If screen width is less than or equal to 768px (mobile view)
+                desktopView.style.display = 'none';  // Hide desktop view
+                mobileView.style.display = 'table-row'; // Show mobile view
+            } else { // If screen width is larger (desktop view)
+                desktopView.style.display = 'table-row'; // Show desktop view
+                mobileView.style.display = 'none'; // Hide mobile view
+            }
+        }
+
+        // Ensure the function is called once the page is loaded
+        window.addEventListener('load', adjustViewBasedOnWindowSize);
+
+        // Ensure the function is called whenever the window is resized
+        window.addEventListener('resize', adjustViewBasedOnWindowSize);
+
+        // Optionally, you can also call the function when you manually change device in developer tools
+        window.addEventListener('orientationchange', adjustViewBasedOnWindowSize);
+    </script> *@
+
+
 
 </head>
 <body class="body-scrollbar">
@@ -189,7 +214,7 @@
                         <th>@column</th>
                     }
                 </tr>
-                <tr class="DesktopView">
+                <tr>
                     @foreach (var field in orderedColumns)
                     {
                         var isFixed = fixedColumns.Contains(field); // Check if the column is fixed
@@ -268,7 +293,8 @@
 
                 </tr>
                 } *@
-                @if(Model.TotalMMM !=null) {
+                @if (Model.TotalMMM != null)
+                {
                     @for (int i = 0; i < Model.TotalMMM.Count; i++)
                     {
                         <tr style="background-color:#155497; color:white">
@@ -317,9 +343,9 @@
 
                             <!-- Loop through TableData and display the related data, matching TM and MMM values -->
                             foreach (var row in Model.TableData.Where(r => r.ContainsKey("TM") && !string.IsNullOrEmpty(r["TM"]?.ToString()) && r.ContainsKey("MUL_MktMngr") && !string.IsNullOrEmpty(r["MUL_MktMngr"]?.ToString()) &&
-                                                                            r["TM"].ToString() == Model.TotalTM[j]["TM"]?.ToString() && r["MUL_MktMngr"].ToString() == Model.TotalMMM[i]["MUL_MktMngr"]?.ToString()))
+                            r["TM"].ToString() == Model.TotalTM[j]["TM"]?.ToString() && r["MUL_MktMngr"].ToString() == Model.TotalMMM[i]["MUL_MktMngr"]?.ToString()))
                             {
-                                
+
 
                                 <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
                                     @foreach (var field in orderedColumns)
@@ -353,7 +379,7 @@
                         }
                     }
 
-                } 
+                }
                 else
                 {
                     @foreach (var row in Model.TableData)
@@ -386,7 +412,7 @@
                             }
                         </tr>
                         rowIndex++;
-                    } 
+                    }
                 }
 
 
@@ -441,24 +467,40 @@
 
         document.addEventListener("DOMContentLoaded", function () {
 
-            
+            /* Reload the page when View Change Begin */
+            let lastViewportWidth = sessionStorage.getItem('lastViewportWidth');
+            let currentWidth = window.innerWidth;
 
+            function checkAndReload() {
+                let newWidth = window.innerWidth;
+                if (lastViewportWidth !== newWidth) {
+                    sessionStorage.setItem('lastViewportWidth', newWidth);
+                    location.reload();
+                }
+            }
+            if (!lastViewportWidth) {
+                sessionStorage.setItem('lastViewportWidth', currentWidth);
+            }
+            window.addEventListener('resize', function () {
+                checkAndReload();
+            });
+            /* Reload the page when View Change End */
 
+            /* Dynamic fixed column handle Begin */
             // Get fixed columns from Razor model
             var fixedColumns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.isFixedCol));
-
             if (fixedColumns.length > 0) {
                 let leftPosition = 0;
                 let zIndex = 10;
 
                 // Find column indexes dynamically
-                let headers = document.querySelectorAll("thead tr:nth-child(2) th"); // Second header row
+                let headers = document.querySelectorAll("thead tr:nth-child(2) th");
                 let columnIndexMap = {};
 
                 headers.forEach((th, index) => {
                     let columnName = th.textContent.trim();
                     if (fixedColumns.includes(columnName)) {
-                        columnIndexMap[columnName] = index + 1; // nth-child starts at 1
+                        columnIndexMap[columnName] = index + 1;
                     }
                 });
 
@@ -468,13 +510,13 @@
 
                     // Calculate the actual width of the column
                     let firstCell = document.querySelector(`th:nth-child(${index})`);
-                    let columnWidth = firstCell ? firstCell.offsetWidth : 100; // Fallback to 100px if not found
+                    let columnWidth = firstCell ? firstCell.offsetWidth : 100;
 
                     document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
                         cell.classList.add("fixed-column");
                         cell.style.left = `${leftPosition}px`;
                         cell.style.zIndex = zIndex;
-                        cell.style.minWidth = `${columnWidth}px`; // Ensure all cells in the column match width
+                        cell.style.minWidth = `${columnWidth}px`;
                         cell.style.maxWidth = `${columnWidth}px`;
                     });
 
@@ -483,8 +525,13 @@
                     zIndex++;
                 });
             }
+            /* Dynamic fixed column handle Begin */
         });
 
     </script>
+
+    
+
+
 </body>
 </html>

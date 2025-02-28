@@ -17,7 +17,7 @@ namespace DynamicView.Models
         //public List<string> SubTotalResults { get; set; }
         public List<List<Dictionary<string, object>>> GetDynamicReport { get; set; }
 
-
+        public bool isMobile { get; set; }
         public List<string> firstRowColumn { get; set; }
         
 
