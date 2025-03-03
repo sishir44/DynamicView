@@ -10,9 +10,6 @@
     var orderedColumns = fixedColumns.Concat(remainingColumns).ToList();
     var isFixedColPresent = fixedColumns.Any(); // Check if fixed columns exist
     var rowIndex = 0; // Track the row index for alternating colors
-
-    //var isFixedM = Model.FieldNames.Where(field => Model.isFixedM.Contains(field)).ToList();
-
 }
 
 <!DOCTYPE html>
@@ -206,13 +203,22 @@
                                 {
                                     var value = row[field.column];
 
-                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                    if (Model.NoOfDecimal.ContainsKey(field.column))
                                     {
-                                        @Convert.ToInt32(decimalValue)
-                                    }
-                                    else if (value is decimal || value is float || value is double)
-                                    {
-                                        @Convert.ToInt32(value)
+                                        var decimalPlaces = Model.NoOfDecimal[field.column]; 
+
+                                        if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                        {
+                                            @decimalValue.ToString("F" + decimalPlaces)
+                                        }
+                                        else if (value is decimal || value is float || value is double)
+                                        {
+                                            @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                        }
+                                        else
+                                        {
+                                            @value
+                                        }
                                     }
                                     else
                                     {
@@ -220,7 +226,7 @@
                                     }
                                 }
                                 else if (field.index == 3)
-                                { // Index 3 means it's the 4th column (0-based index)
+                                { 
                                     @("Grand Total")
                                 }
                                 else
@@ -232,39 +238,6 @@
 
                     </tr>
                 }
-
-                <!-- Data Rows -->
-                @* @foreach (var row in Model.TableData)
-                {
-                <tr>
-                @foreach (var field in orderedColumns)
-                {
-                <td data-column="@field">
-                @if (row.ContainsKey(field))
-                {
-                var value = row[field];
-                if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
-                {
-                @Convert.ToInt32(decimalValue)
-                }
-                else if (value is decimal || value is float || value is double)
-                {
-                @Convert.ToInt32(value)
-                }
-                else
-                {
-                @value
-                }
-                }
-                else
-                {
-                @("--")
-                }
-                </td>
-                }
-
-                </tr>
-                } *@
                 @if (Model.TotalMMM != null)
                 {
                     @for (int i = 0; i < Model.TotalMMM.Count; i++)
@@ -276,7 +249,27 @@
                                     @if (Model.TotalMMM[i].ContainsKey(field.column))
                                     {
                                         var value = Model.TotalMMM[i][field.column];
-                                        @value
+                                        if (Model.NoOfDecimal.ContainsKey(field.column))
+                                        {
+                                            var decimalPlaces = Model.NoOfDecimal[field.column]; 
+
+                                            if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                            {
+                                                @decimalValue.ToString("F" + decimalPlaces)
+                                            }
+                                            else if (value is decimal || value is float || value is double)
+                                            {
+                                                @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                            }
+                                            else
+                                            {
+                                                @value
+                                            }
+                                        }
+                                        else
+                                        {
+                                            @value
+                                        }
                                     }
                                     else if (field.index == 0)
                                     {
@@ -299,8 +292,28 @@
                                         @if (Model.TotalTM[j].ContainsKey(field.column))
                                         {
                                             var value = Model.TotalTM[j][field.column];
-                                            @value
-                                        }
+                                            if (Model.NoOfDecimal.ContainsKey(field.column))
+                                            {
+                                                var decimalPlaces = Model.NoOfDecimal[field.column]; 
+
+                                                if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                                {
+                                                    @decimalValue.ToString("F" + decimalPlaces)
+                                                }
+                                                else if (value is decimal || value is float || value is double)
+                                                {
+                                                    @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                                }
+                                                else
+                                                {
+                                                    @value
+                                                }
+                                            }
+                                            else
+                                            {
+                                                @value
+                                            }
+                                        } 
                                         else if (field.index == 0)
                                         {
                                             @("TM Total")
@@ -317,8 +330,6 @@
                             foreach (var row in Model.TableData.Where(r => r.ContainsKey("TM") && !string.IsNullOrEmpty(r["TM"]?.ToString()) && r.ContainsKey("MUL_MktMngr") && !string.IsNullOrEmpty(r["MUL_MktMngr"]?.ToString()) &&
                             r["TM"].ToString() == Model.TotalTM[j]["TM"]?.ToString() && r["MUL_MktMngr"].ToString() == Model.TotalMMM[i]["MUL_MktMngr"]?.ToString()))
                             {
-
-
                                 <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
                                     @foreach (var field in orderedColumns)
                                     {
@@ -326,13 +337,23 @@
                                             @if (row.ContainsKey(field))
                                             {
                                                 var value = row[field];
-                                                if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+
+                                                if (Model.NoOfDecimal.ContainsKey(field))
                                                 {
-                                                    @Convert.ToInt32(decimalValue)
-                                                }
-                                                else if (value is decimal || value is float || value is double)
-                                                {
-                                                    @Convert.ToInt32(value)
+                                                    var decimalPlaces = Model.NoOfDecimal[field]; 
+
+                                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                                    {
+                                                        @decimalValue.ToString("F" + decimalPlaces)
+                                                    }
+                                                    else if (value is decimal || value is float || value is double)
+                                                    {
+                                                        @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                                    }
+                                                    else
+                                                    {
+                                                        @value
+                                                    }
                                                 }
                                                 else
                                                 {
@@ -341,7 +362,7 @@
                                             }
                                             else
                                             {
-                                                @("")
+                                                @(" ")
                                             }
                                         </td>
                                     }
@@ -350,9 +371,8 @@
                             }
                         }
                     }
-
                 }
-                else
+                else 
                 {
                     @foreach (var row in Model.TableData)
                     {
@@ -363,13 +383,23 @@
                                     @if (row.ContainsKey(field))
                                     {
                                         var value = row[field];
-                                        if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+
+                                        if (Model.NoOfDecimal.ContainsKey(field))
                                         {
-                                            @Convert.ToInt32(decimalValue)
-                                        }
-                                        else if (value is decimal || value is float || value is double)
-                                        {
-                                            @Convert.ToInt32(value)
+                                            var decimalPlaces = Model.NoOfDecimal[field]; 
+
+                                            if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                            {
+                                                @decimalValue.ToString("F" + decimalPlaces)
+                                            }
+                                            else if (value is decimal || value is float || value is double)
+                                            {
+                                                @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                            }
+                                            else
+                                            {
+                                                @value
+                                            }
                                         }
                                         else
                                         {
@@ -392,48 +422,6 @@
 
 
     <script>
-        // document.addEventListener("DOMContentLoaded", function () {
-        //     // Get fixed columns from Razor model
-        //     var fixedColumns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.isFixedCol));
-
-        //     if (fixedColumns.length > 0) {
-        //         let leftPosition = 0;
-        //         let zIndex = 10;
-
-        //         // Find column indexes dynamically
-        //         let headers = document.querySelectorAll("thead tr:nth-child(2) th"); // Second header row
-        //         let columnIndexMap = {};
-
-        //         headers.forEach((th, index) => {
-        //             let columnName = th.textContent.trim();
-        //             if (fixedColumns.includes(columnName)) {
-        //                 columnIndexMap[columnName] = index + 1; // nth-child starts at 1
-        //             }
-        //         });
-
-        //         // Apply sticky styles to fixed columns
-        //         Object.keys(columnIndexMap).forEach((colName) => {
-        //             let index = columnIndexMap[colName];
-
-        //             // Calculate the actual width of the column
-        //             let firstCell = document.querySelector(`th:nth-child(${index})`);
-        //             let columnWidth = firstCell ? firstCell.offsetWidth : 100; // Fallback to 100px if not found
-
-        //             document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
-        //                 cell.classList.add("fixed-column");
-        //                 cell.style.left = `${leftPosition}px`;
-        //                 cell.style.zIndex = zIndex;
-        //                 cell.style.minWidth = `${columnWidth}px`; // Ensure all cells in the column match width
-        //                 cell.style.maxWidth = `${columnWidth}px`;
-        //             });
-
-        //             // Increment leftPosition based on actual column width
-        //             leftPosition += columnWidth;
-        //             zIndex++;
-        //         });
-        //     }
-        // });
-
         document.addEventListener("DOMContentLoaded", function () {
 
             /* Reload the page when View Change Begin */
@@ -494,12 +482,12 @@
                     zIndex++;
                 });
             }
-            /* Dynamic fixed column handle Begin */
+            /* Dynamic fixed column handle End */
         });
 
     </script>
 
-    
+
 
 
 </body>

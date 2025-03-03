@@ -8,6 +8,7 @@ namespace DynamicView.Models
         public List<string> isFixedM { get; set; }
         public List<string> isFilterCol { get; set; }
         public List<string> isSubTotalCol { get; set; }
+        public Dictionary<string, short?> NoOfDecimal { get; set; }
         public List<Dictionary<string, object>> TableData { get; set; }
         public List<Dictionary<string, object>> TotalSum { get; set; }
         public List<Dictionary<string, object>> SubTotalResults { get; set; }
@@ -20,6 +21,7 @@ namespace DynamicView.Models
         public bool isMobile { get; set; }
         public List<string> firstRowColumn { get; set; }
         
+
 
 
         // public List<string> TtlCount { get; set; }

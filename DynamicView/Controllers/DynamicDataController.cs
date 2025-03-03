@@ -12,7 +12,7 @@ public class DynamicDataController : Controller
         _dbService = dbService;
     }
 
-    public async Task<IActionResult> Index(int reportId = 2)
+    public async Task<IActionResult> Index(int reportId = 1)
     {
         DynamicDataModel model = new DynamicDataModel();
 
@@ -49,6 +49,7 @@ public class DynamicDataController : Controller
             var fourthTable = result.resultSet4[0]; // is Fixed for Mobile
             var fifthTable = result.resultSet5[0];  // isFilter
             var sixthTable = result.resultSet6[0]; // subtotal
+            var sevenTable = result.resultSet7[0]; // No of Decimal
 
             var firstRow = firstTable?.Rows.Cast<DataRow>().FirstOrDefault();
             // get col header, data and color
@@ -149,6 +150,17 @@ public class DynamicDataController : Controller
                 }
             }
 
+            // No of decimal
+            if (sevenTable != null)
+            {
+                model.NoOfDecimal = sevenTable.AsEnumerable().Where(row => row.Field<short?>("NoOfDecimal") > 0)  
+                            .Select(row => new
+                            {
+                                Alias = row["Alias"]?.ToString().Trim('[', ']'),  
+                                NoOfDecimal = row.Field<short?>("NoOfDecimal")  
+                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.NoOfDecimal);  
+            }
+
 
             // Generate alphabetic column names
             int NumberOfColumns = model.FieldNames.Count;
@@ -180,14 +192,21 @@ public class DynamicDataController : Controller
     // Convert number to Excel-style alphabetical sequence (A, B, C, AA, AB, etc.)
     public string GetAlphabeticalSequence(int num)
     {
-        string result = "";
-        while (num > 0)
+        try
         {
-            num--;
-            result = (char)('A' + (num % 26)) + result;
-            num /= 26;
+            string result = "";
+            while (num > 0)
+            {
+                num--;
+                result = (char)('A' + (num % 26)) + result;
+                num /= 26;
+            }
+            return result;
         }
-        return result;
+        catch (Exception ex)
+        {
+            throw new Exception(ex.Message);
+        }
     }
 
     public bool IsMobileRequest(HttpContext context)
