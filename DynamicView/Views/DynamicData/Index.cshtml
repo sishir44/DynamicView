@@ -220,6 +220,10 @@
                                             @value
                                         }
                                     }
+                                    else if (value is decimal || value is float || value is double)
+                                    {
+                                        @Convert.ToInt32(value).ToString()
+                                    }
                                     else
                                     {
                                         @value
@@ -266,6 +270,10 @@
                                                 @value
                                             }
                                         }
+                                        else if (value is decimal || value is float || value is double)
+                                        {
+                                            @Convert.ToInt32(value).ToString()
+                                        }
                                         else
                                         {
                                             @value
@@ -308,6 +316,10 @@
                                                 {
                                                     @value
                                                 }
+                                            }
+                                            else if (value is decimal || value is float || value is double)
+                                            {
+                                                @Convert.ToInt32(value).ToString()
                                             }
                                             else
                                             {
@@ -383,6 +395,10 @@
                                                     {
                                                         @value
                                                     }
+                                                }
+                                                else if (value is decimal || value is float || value is double)
+                                                {
+                                                    @Convert.ToInt32(value).ToString()
                                                 }
                                                 else
                                                 {
