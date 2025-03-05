@@ -350,11 +350,8 @@
                                             {
                                                 var value = row[field];
 
-
-
-                                                if (Model.NoOfDecimal.ContainsKey(field) || (Model.ColorAliasName.Contains(field)))
+                                                if (Model.NoOfDecimal.ContainsKey(field) && (Model.ColorAliasName.Contains(field)))
                                                 {
-
                                                     var decimalPlaces = Model.NoOfDecimal[field];
 
                                                     if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
@@ -390,11 +387,34 @@
                                                         {
                                                             @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
                                                         }
-                                                    }
+                                                    } 
                                                     else
                                                     {
                                                         @value
                                                     }
+                                                }
+                                                else if (Model.ColorAliasName.Contains(field))
+                                                {
+                                                    //decimal formattedValue = Convert.ToInt32(value) * 10;
+                                                    decimal formattedValue = Convert.ToDecimal(value);
+
+                                                    var backgroundColor = "transparent";
+
+                                                    if ((float)formattedValue < Model.ColorValue1)
+                                                    {
+                                                        backgroundColor = Model.ColorCode1;
+                                                    }
+                                                    else if ((float)formattedValue >= Model.ColorValue1 && (float)formattedValue < Model.ColorValue2)
+                                                    {
+                                                        backgroundColor = Model.ColorCode2;
+                                                    }
+                                                    else if ((float)formattedValue >= Model.ColorValue2 && (float)formattedValue < Model.ColorValue3)
+                                                    {
+                                                        backgroundColor = Model.ColorCode3;
+                                                    }
+                                                    <div style="background-color: @backgroundColor;">
+                                                        @formattedValue.ToString()
+                                                    </div>
                                                 }
                                                 else if (value is decimal || value is float || value is double)
                                                 {
