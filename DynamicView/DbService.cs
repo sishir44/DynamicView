@@ -366,7 +366,7 @@ public class DbService
         }
         return resultList;
     }
-    public (List<DataTable> resultSet1, List<DataTable> resultSet2, List<DataTable> resultSet3, List<DataTable> resultSet4, List<DataTable> resultSet5, List<DataTable> resultSet6, List<DataTable> resultSet7) GetDynamicReportNew(int reportID)
+    public (List<DataTable> resultSet1, List<DataTable> resultSet2, List<DataTable> resultSet3, List<DataTable> resultSet4, List<DataTable> resultSet5, List<DataTable> resultSet6, List<DataTable> resultSet7, List<DataTable> resultSet8) GetDynamicReportNew(int reportID)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
@@ -385,8 +385,9 @@ public class DbService
             List<DataTable> resultSet5 = new List<DataTable> { dataSet.Tables[4] };
             List<DataTable> resultSet6 = new List<DataTable> { dataSet.Tables[5] };
             List<DataTable> resultSet7 = new List<DataTable> { dataSet.Tables[6] }; // no of decimal
+            List<DataTable> resultSet8 = new List<DataTable> { dataSet.Tables[7] }; // color column
 
-            return (resultSet1, resultSet2, resultSet3, resultSet4, resultSet5, resultSet6,resultSet7);
+            return (resultSet1, resultSet2, resultSet3, resultSet4, resultSet5, resultSet6,resultSet7, resultSet8);
         }
     }
 

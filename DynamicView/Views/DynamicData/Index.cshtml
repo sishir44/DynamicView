@@ -205,7 +205,7 @@
 
                                     if (Model.NoOfDecimal.ContainsKey(field.column))
                                     {
-                                        var decimalPlaces = Model.NoOfDecimal[field.column]; 
+                                        var decimalPlaces = Model.NoOfDecimal[field.column];
 
                                         if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
                                         {
@@ -226,7 +226,7 @@
                                     }
                                 }
                                 else if (field.index == 3)
-                                { 
+                                {
                                     @("Grand Total")
                                 }
                                 else
@@ -251,7 +251,7 @@
                                         var value = Model.TotalMMM[i][field.column];
                                         if (Model.NoOfDecimal.ContainsKey(field.column))
                                         {
-                                            var decimalPlaces = Model.NoOfDecimal[field.column]; 
+                                            var decimalPlaces = Model.NoOfDecimal[field.column];
 
                                             if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
                                             {
@@ -294,7 +294,7 @@
                                             var value = Model.TotalTM[j][field.column];
                                             if (Model.NoOfDecimal.ContainsKey(field.column))
                                             {
-                                                var decimalPlaces = Model.NoOfDecimal[field.column]; 
+                                                var decimalPlaces = Model.NoOfDecimal[field.column];
 
                                                 if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
                                                 {
@@ -313,7 +313,7 @@
                                             {
                                                 @value
                                             }
-                                        } 
+                                        }
                                         else if (field.index == 0)
                                         {
                                             @("TM Total")
@@ -338,9 +338,12 @@
                                             {
                                                 var value = row[field];
 
-                                                if (Model.NoOfDecimal.ContainsKey(field))
+
+
+                                                if (Model.NoOfDecimal.ContainsKey(field) || (Model.ColorAliasName.Contains(field)))
                                                 {
-                                                    var decimalPlaces = Model.NoOfDecimal[field]; 
+
+                                                    var decimalPlaces = Model.NoOfDecimal[field];
 
                                                     if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
                                                     {
@@ -348,7 +351,33 @@
                                                     }
                                                     else if (value is decimal || value is float || value is double)
                                                     {
-                                                        @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                                        @if (Model.ColorAliasName.Contains(field))
+                                                        {
+                                                            decimal formattedValue = Convert.ToDecimal(value) * 100;
+
+                                                            var backgroundColor = "transparent";  
+
+                                                            if ((float)formattedValue < Model.ColorValue1)
+                                                            {
+                                                                backgroundColor = Model.ColorCode1; 
+                                                            }
+                                                            else if ((float)formattedValue >= Model.ColorValue1 && (float)formattedValue < Model.ColorValue2)
+                                                            {
+                                                                backgroundColor = Model.ColorCode2; 
+                                                            }
+                                                            else if ((float)formattedValue >= Model.ColorValue2 && (float)formattedValue < Model.ColorValue3)
+                                                            {
+                                                                backgroundColor = Model.ColorCode3; 
+                                                            }
+                                                            //@formattedValue.ToString("F" + decimalPlaces)
+                                                            <div style="background-color: @backgroundColor;">
+                                                                @formattedValue.ToString("F" + decimalPlaces)
+                                                            </div>
+                                                        } 
+                                                        else
+                                                        {
+                                                            @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                                        }
                                                     }
                                                     else
                                                     {
@@ -372,7 +401,7 @@
                         }
                     }
                 }
-                else 
+                else
                 {
                     @foreach (var row in Model.TableData)
                     {
@@ -386,7 +415,7 @@
 
                                         if (Model.NoOfDecimal.ContainsKey(field))
                                         {
-                                            var decimalPlaces = Model.NoOfDecimal[field]; 
+                                            var decimalPlaces = Model.NoOfDecimal[field];
 
                                             if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
                                             {

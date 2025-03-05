@@ -50,6 +50,7 @@ public class DynamicDataController : Controller
             var fifthTable = result.resultSet5[0];  // isFilter
             var sixthTable = result.resultSet6[0]; // subtotal
             var sevenTable = result.resultSet7[0]; // No of Decimal
+            var eightTable = result.resultSet8[0]; // No of Decimal
 
             var firstRow = firstTable?.Rows.Cast<DataRow>().FirstOrDefault();
             // get col header, data and color
@@ -153,12 +154,44 @@ public class DynamicDataController : Controller
             // No of decimal
             if (sevenTable != null)
             {
-                model.NoOfDecimal = sevenTable.AsEnumerable().Where(row => row.Field<short?>("NoOfDecimal") > 0)  
+                model.NoOfDecimal = sevenTable.AsEnumerable().Where(row => row.Field<short?>("NoOfDecimal") > 0)
                             .Select(row => new
                             {
-                                Alias = row["Alias"]?.ToString().Trim('[', ']'),  
-                                NoOfDecimal = row.Field<short?>("NoOfDecimal")  
-                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.NoOfDecimal);  
+                                Alias = row["Alias"]?.ToString().Trim('[', ']'),
+                                NoOfDecimal = row.Field<short?>("NoOfDecimal")
+                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.NoOfDecimal);
+            }
+
+            // color column and data
+            if (eightTable != null)
+            {
+                model.ColorAliasName = eightTable.Columns.Contains("Alias") ? eightTable.AsEnumerable().Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                  .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
+            }
+            if (result.resultSet8 != null && result.resultSet8.Count > 0)
+            {
+               
+
+                foreach (DataRow row in eightTable.Rows)
+                {
+                    // Access column values for the current row and assign them to the model
+                    //model.ColorValue1 = row["ColorValue1"] != DBNull.Value ? row["ColorValue1"].ToString(): null;
+                    //model.ColorCode1 = row["ColorCode1"] != DBNull.Value ? row["ColorCode1"].ToString() : null;
+                    //model.ColorValue2 = row["ColorValue2"] != DBNull.Value ? row["ColorValue2"].ToString() : null;
+                    //model.ColorCode2 = row["ColorCode2"] != DBNull.Value ? row["ColorCode2"].ToString() : null;
+                    //model.ColorValue3 = row["ColorValue3"] != DBNull.Value ? row["ColorValue3"].ToString() : null;
+                    //model.ColorCode3 = row["ColorCode3"] != DBNull.Value ? row["ColorCode3"].ToString() : null;
+
+
+                    model.ColorValue1 = row["ColorValue1"] != DBNull.Value ? Convert.ToSingle(row["ColorValue1"]) : 0f;
+                    model.ColorCode1 = row["ColorCode1"] != DBNull.Value ? row["ColorCode1"].ToString() : null;
+
+                    model.ColorValue2 = row["ColorValue2"] != DBNull.Value ? Convert.ToSingle(row["ColorValue2"]) : 0f;  // Assigning default value of 0 if DBNull
+                    model.ColorCode2 = row["ColorCode2"] != DBNull.Value ? row["ColorCode2"].ToString() : null;
+
+                    model.ColorValue3 = row["ColorValue3"] != DBNull.Value ? Convert.ToSingle(row["ColorValue3"]) : 0f;  // Assigning default value of 0 if DBNull
+                    model.ColorCode3 = row["ColorCode3"] != DBNull.Value ? row["ColorCode3"].ToString() : null;
+                }
             }
 
 

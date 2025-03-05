@@ -38,5 +38,15 @@ namespace DynamicView.Models
 
 
 
+        // color code property
+        public List<string> ColorAliasName { get; set; }
+        public float? ColorValue1 { get; set; }
+        public string ColorCode1 { get; set; }
+        public float? ColorValue2 { get; set; }
+        public string ColorCode2 { get; set; }
+        public float? ColorValue3 { get; set; }
+        public string ColorCode3 { get; set; }
+
+
     }
 }
