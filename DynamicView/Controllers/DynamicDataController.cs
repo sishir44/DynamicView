@@ -51,6 +51,7 @@ public class DynamicDataController : Controller
             var sixthTable = result.resultSet6[0]; // subtotal
             var sevenTable = result.resultSet7[0]; // No of Decimal
             var eightTable = result.resultSet8[0]; // No of Decimal
+            var nineTable = result.resultSet9[0]; // percentage ratio 
 
             var firstRow = firstTable?.Rows.Cast<DataRow>().FirstOrDefault();
             // get col header, data and color
@@ -192,6 +193,17 @@ public class DynamicDataController : Controller
                     model.ColorValue3 = row["ColorValue3"] != DBNull.Value ? Convert.ToSingle(row["ColorValue3"]) : 0f;  // Assigning default value of 0 if DBNull
                     model.ColorCode3 = row["ColorCode3"] != DBNull.Value ? row["ColorCode3"].ToString() : null;
                 }
+            }
+
+            // Percentage Rtaio
+            if (nineTable != null)
+            {
+                model.isPercentorRatio = nineTable.AsEnumerable().Where(row => row.Field<bool?>("isPercentorRatio") == true)
+                            .Select(row => new
+                            {
+                                Alias = row["Alias"]?.ToString().Trim('[', ']'),
+                                isPercentorRatio = row.Field<bool?>("isPercentorRatio")
+                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.isPercentorRatio);
             }
 
 

@@ -50,7 +50,8 @@ th {
     vertical-align: middle;
     text-align: center;
     height: auto;
-    font-size: 14px;
+    font-size: 11px;
+    font-family: 'Open Sans', sans-serif;
 }
 
 th, td {
@@ -60,12 +61,12 @@ th, td {
     z-index: 2;
     white-space: normal;
     word-wrap: break-word;
-    font-size: 10px;
+    font-size: 11px;
 }
 
 tbody, tr, td {
     width: auto;
-    font-size: 10px;
+    font-size: 9px;
 }
 
 .optionfilter {

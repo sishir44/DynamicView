@@ -9,6 +9,7 @@ namespace DynamicView.Models
         public List<string> isFilterCol { get; set; }
         public List<string> isSubTotalCol { get; set; }
         public Dictionary<string, short?> NoOfDecimal { get; set; }
+        public Dictionary<string, bool?> isPercentorRatio { get; set; }
         public List<Dictionary<string, object>> TableData { get; set; }
         public List<Dictionary<string, object>> TotalSum { get; set; }
         public List<Dictionary<string, object>> SubTotalResults { get; set; }
