@@ -36,6 +36,9 @@
             border-right: 1px solid white;
             left: 0px;
             z-index: 10;
+            width: 100%;
+            vertical-align: center;
+            height: auto;
         }
 
         .odd-row {
@@ -323,34 +326,51 @@
                                 </td>
                             }
                         </tr>
-
-                        @for (int j = 0; j < Model.TotalTM.Count; j++)
+                        @if (Model.TotalTM != null)
                         {
-                            <tr style="background-color: #87d1fa; color:white">
-                                @foreach (var field in orderedColumns.Select((column, index) => new { column, index }))
-                                {
-                                    bool isPercentColumn = Model.isPercentorRatio != null && Model.isPercentorRatio.ContainsKey(field.column) && Model.isPercentorRatio[field.column] == true;
-                                    <td data-column="@field.column">
-                                        @if (Model.TotalTM[j].ContainsKey(field.column))
-                                        {
-                                            var value = Model.TotalTM[j][field.column];
-                                            if (Model.NoOfDecimal.ContainsKey(field.column))
+                            @for (int j = 0; j < Model.TotalTM.Count; j++)
+                            {
+                                <tr style="background-color: #87d1fa; color:white">
+                                    @foreach (var field in orderedColumns.Select((column, index) => new { column, index }))
+                                    {
+                                        bool isPercentColumn = Model.isPercentorRatio != null && Model.isPercentorRatio.ContainsKey(field.column) && Model.isPercentorRatio[field.column] == true;
+                                        <td data-column="@field.column">
+                                            @if (Model.TotalTM[j].ContainsKey(field.column))
                                             {
-                                                var decimalPlaces = Model.NoOfDecimal[field.column];
-
-                                                if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                                var value = Model.TotalTM[j][field.column];
+                                                if (Model.NoOfDecimal.ContainsKey(field.column))
                                                 {
-                                                    @decimalValue.ToString("F" + decimalPlaces)
+                                                    var decimalPlaces = Model.NoOfDecimal[field.column];
+
+                                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                                    {
+                                                        @decimalValue.ToString("F" + decimalPlaces)
+                                                    }
+                                                    else if (value is decimal || value is float || value is double)
+                                                    {
+                                                        if (isPercentColumn)
+                                                        {
+                                                            @((Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces) + " %")
+                                                        }
+                                                        else
+                                                        {
+                                                            @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        @value
+                                                    }
                                                 }
                                                 else if (value is decimal || value is float || value is double)
                                                 {
                                                     if (isPercentColumn)
                                                     {
-                                                        @((Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces) + " %")
+                                                        @((Convert.ToDecimal(value) * 100).ToString("F" + 1) + " %")
                                                     }
                                                     else
                                                     {
-                                                        @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                                        @Convert.ToInt32(value).ToString()
                                                     }
                                                 }
                                                 else
@@ -358,39 +378,23 @@
                                                     @value
                                                 }
                                             }
-                                            else if (value is decimal || value is float || value is double)
+                                            else if (field.index == 0)
                                             {
-                                                if (isPercentColumn)
-                                                {
-                                                    @((Convert.ToDecimal(value) * 100).ToString("F" + 1) + " %")
-                                                }
-                                                else
-                                                {
-                                                    @Convert.ToInt32(value).ToString()
-                                                }
+                                                @("TM Total")
                                             }
                                             else
                                             {
-                                                @value
+                                                @(" ")
                                             }
-                                        }
-                                        else if (field.index == 0)
-                                        {
-                                            @("TM Total")
-                                        }
-                                        else
-                                        {
-                                            @(" ")
-                                        }
-                                    </td>
-                                }
-                            </tr>
+                                        </td>
+                                    }
+                                </tr>
 
-                            <!-- Loop through TableData and display the related data, matching TM and MMM values -->
-                            foreach (var row in Model.TableData.Where(r => r.ContainsKey("TM") && !string.IsNullOrEmpty(r["TM"]?.ToString()) && r.ContainsKey("MUL_MktMngr") && !string.IsNullOrEmpty(r["MUL_MktMngr"]?.ToString()) &&
-                            r["TM"].ToString() == Model.TotalTM[j]["TM"]?.ToString() && r["MUL_MktMngr"].ToString() == Model.TotalMMM[i]["MUL_MktMngr"]?.ToString()))
-                            {
-                                @* <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
+                                <!-- Loop through TableData and display the related data, matching TM and MMM values -->
+                                foreach (var row in Model.TableData.Where(r => r.ContainsKey("TM") && !string.IsNullOrEmpty(r["TM"]?.ToString()) && r.ContainsKey("MUL_MktMngr") && !string.IsNullOrEmpty(r["MUL_MktMngr"]?.ToString()) &&
+                                r["TM"].ToString() == Model.TotalTM[j]["TM"]?.ToString() && r["MUL_MktMngr"].ToString() == Model.TotalMMM[i]["MUL_MktMngr"]?.ToString()))
+                                {
+                                    @* <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
                 @foreach (var field in orderedColumns)
                 {
                 <td data-column="@field">
@@ -493,43 +497,102 @@
                 }
                 </tr> *@
 
-                                <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
-                                    @foreach (var field in orderedColumns)
-                                    {
-                                        var backgroundColor = "transparent"; // Default background color
-                                        var formattedValue = ""; // Default value display
-                                        decimal formattedDecimalValue;
-
-                                        if (row.ContainsKey(field))
+                                    <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
+                                        @foreach (var field in orderedColumns)
                                         {
-                                            var value = row[field];
+                                            var backgroundColor = "transparent"; // Default background color
+                                            var formattedValue = ""; // Default value display
+                                            decimal formattedDecimalValue;
 
-                                            bool isPercentColumn = Model.isPercentorRatio != null && Model.isPercentorRatio.ContainsKey(field) && Model.isPercentorRatio[field] == true;
-
-                                            if (Model.NoOfDecimal.ContainsKey(field) && Model.ColorAliasName.Contains(field))
+                                            if (row.ContainsKey(field))
                                             {
-                                                var decimalPlaces = Model.NoOfDecimal[field];
-                                                decimal decimalVal = Convert.ToDecimal(value);
+                                                var value = row[field];
+                                                Console.WriteLine(value.GetType());
+
+                                                bool isPercentColumn = Model.isPercentorRatio != null && Model.isPercentorRatio.ContainsKey(field) && Model.isPercentorRatio[field] == true;
+
+                                                if (Model.NoOfDecimal.ContainsKey(field) && Model.ColorAliasName.Contains(field))
+                                                {
+                                                    var decimalPlaces = Model.NoOfDecimal[field];
+                                                    decimal decimalVal = Convert.ToDecimal(value);
 
 
-                                                if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
-                                                {
-                                                    formattedValue = decimalValue.ToString("F" + decimalPlaces);
-                                                }
-                                                else if (value is decimal || value is float || value is double)
-                                                {
-                                                    if (isPercentColumn)
+                                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
                                                     {
-                                                        formattedDecimalValue = decimalVal * 100;
-                                                        formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces) + " %";
+                                                        formattedValue = decimalValue.ToString("F" + decimalPlaces);
+                                                    }
+                                                    else if (value is decimal || value is float || value is double)
+                                                    {
+                                                        if (isPercentColumn)
+                                                        {
+                                                            formattedDecimalValue = decimalVal * 100;
+                                                            formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces) + " %";
+                                                        }
+                                                        else
+                                                        {
+                                                            formattedDecimalValue = decimalVal;
+                                                            formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces);
+                                                        }
+
+                                                        // Determine background color based on value
+                                                        if (formattedDecimalValue < (decimal)Model.ColorValue1)
+                                                        {
+                                                            backgroundColor = Model.ColorCode1;
+                                                        }
+                                                        else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && formattedDecimalValue < (decimal)Model.ColorValue2)
+                                                        {
+                                                            backgroundColor = Model.ColorCode2;
+                                                        }
+                                                        else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && formattedDecimalValue < (decimal)Model.ColorValue3)
+                                                        {
+                                                            backgroundColor = Model.ColorCode3;
+                                                        }
                                                     }
                                                     else
                                                     {
-                                                        formattedDecimalValue = decimalVal;
-                                                        formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces);
+                                                        formattedValue = value.ToString();
                                                     }
+                                                }
+                                                else if (Model.NoOfDecimal.ContainsKey(field))
+                                                {
+                                                    var decimalPlaces = Model.NoOfDecimal[field];
+                                                    decimal decimalVal = Convert.ToDecimal(value);
 
-                                                    // Determine background color based on value
+                                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                                    {
+                                                        formattedValue = decimalValue.ToString("F" + decimalPlaces);
+                                                    }
+                                                    else if (value is decimal || value is float || value is double)
+                                                    {
+                                                        if (isPercentColumn)
+                                                        {
+                                                            formattedDecimalValue = decimalVal * 100;
+                                                            formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces) + " %";
+                                                        }
+                                                        else
+                                                        {
+                                                            formattedDecimalValue = decimalVal;
+                                                            formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces);
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        formattedValue = value.ToString();
+                                                    }
+                                                }
+                                                else if (Model.ColorAliasName.Contains(field))
+                                                {
+                                                    if (isPercentColumn)
+                                                    {
+                                                        formattedDecimalValue = (decimal)value * 100;
+                                                        formattedValue = formattedDecimalValue.ToString() + " %";
+                                                    }
+                                                    else
+                                                    {
+                                                        formattedDecimalValue = Convert.ToInt32(value);
+                                                        formattedValue = formattedDecimalValue.ToString();
+                                                    }
+                                                    // Determine background color
                                                     if (formattedDecimalValue < (decimal)Model.ColorValue1)
                                                     {
                                                         backgroundColor = Model.ColorCode1;
@@ -543,66 +606,44 @@
                                                         backgroundColor = Model.ColorCode3;
                                                     }
                                                 }
-                                                else
+                                                else if (value is decimal || value is float || value is double)
                                                 {
-                                                    formattedValue = value.ToString();
-                                                }
-                                            }
-                                            else if (Model.ColorAliasName.Contains(field))
-                                            {
-                                                if (isPercentColumn)
-                                                {
-                                                    formattedDecimalValue = (decimal)value * 100;
-                                                    formattedValue = formattedDecimalValue.ToString("F" + 1) + " %";
-                                                }
-                                                else
-                                                {
-                                                    formattedDecimalValue = (decimal)value;
-                                                    formattedValue = formattedDecimalValue.ToString("F" + 1);
-                                                }
-                                                // Determine background color
-                                                if (formattedDecimalValue < (decimal)Model.ColorValue1)
-                                                {
-                                                    backgroundColor = Model.ColorCode1;
-                                                }
-                                                else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && formattedDecimalValue < (decimal)Model.ColorValue2)
-                                                {
-                                                    backgroundColor = Model.ColorCode2;
-                                                }
-                                                else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && formattedDecimalValue < (decimal)Model.ColorValue3)
-                                                {
-                                                    backgroundColor = Model.ColorCode3;
-                                                }
-                                            }
-                                            else if (value is decimal || value is float || value is double)
-                                            {
-                                                if (isPercentColumn)
-                                                {
-                                                    formattedValue = (Convert.ToDecimal(value) * 100).ToString("F1") + " %";
+                                                    if (isPercentColumn)
+                                                    {
+                                                        formattedValue = (Convert.ToDecimal(value) * 100).ToString("F1") + " %";
+                                                    }
+                                                    else
+                                                    {
+                                                        formattedValue = Convert.ToInt32(value).ToString();
+                                                    }
                                                 }
                                                 else
                                                 {
-                                                    formattedValue = Convert.ToInt32(value).ToString();
+                                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                                    {
+                                                        decimalValue = Math.Floor(decimalValue);
+                                                        formattedValue = decimalValue.ToString();
+                                                    }
+                                                    else
+                                                    {
+                                                        formattedValue = value.ToString();
+                                                    }
                                                 }
                                             }
                                             else
                                             {
-                                                formattedValue = value.ToString();
+                                                formattedValue = " ";
                                             }
-                                        }
-                                        else
-                                        {
-                                            formattedValue = " ";
-                                        }
 
-                                        // Apply the background color directly to <td>
-                                        <td data-column="@field" style="background-color: @backgroundColor;">
-                                            @formattedValue
-                                        </td>
-                                    }
-                                </tr>
+                                            // Apply the background color directly to <td>
+                                            <td data-column="@field" style="background-color: @backgroundColor;">
+                                                @formattedValue
+                                            </td>
+                                        }
+                                    </tr>
 
-                                rowIndex++;
+                                    rowIndex++;
+                                }
                             }
                         }
                     }
