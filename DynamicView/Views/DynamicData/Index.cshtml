@@ -46,129 +46,129 @@
 
     <script>
         $(document).ready(function () {
-        $(".selectorinput").on("keyup", function () {
-        let columnId = $(this).attr("data-column");
-        let input = $(this).val().toLowerCase();
+            $(".selectorinput").on("keyup", function () {
+                let columnId = $(this).attr("data-column");
+                let input = $(this).val().toLowerCase();
 
-        let $dropdown = $("#dropdown_" + columnId);
-        if ($dropdown.length) {
-        $dropdown.find("option").each(function () {
-        $(this).toggle($(this).text().toLowerCase().includes(input));
-        });
-        }
-        });
-        // $("#dataTable tbody tr").each(function () {
-        //     let $row = $(this);
-        //     let $td = $row.find(`[data-column='${columnId}']`);
-        //     let isGrandTotal = $row.attr("id") === "grandTotalRow";
+                let $dropdown = $("#dropdown_" + columnId);
+                if ($dropdown.length) {
+                    $dropdown.find("option").each(function () {
+                        $(this).toggle($(this).text().toLowerCase().includes(input));
+                    });
+                }
+            });
+            // $("#dataTable tbody tr").each(function () {
+            //     let $row = $(this);
+            //     let $td = $row.find(`[data-column='${columnId}']`);
+            //     let isGrandTotal = $row.attr("id") === "grandTotalRow";
 
-        //     if (isGrandTotal) {
-        //         $row.show();
-        //     } else if ($td.length) {
-        //         let textValue = $td.text().toLowerCase();
-        //         $row.toggle(textValue.includes(input));
-        //     }
-        // });
+            //     if (isGrandTotal) {
+            //         $row.show();
+            //     } else if ($td.length) {
+            //         let textValue = $td.text().toLowerCase();
+            //         $row.toggle(textValue.includes(input));
+            //     }
+            // });
 
-        // Handle clicking an option in the dropdown to filter data
-        $(".filter-dropdown").on("click", "option", function () {
-        let columnId = $(this).closest(".filter-dropdown").attr("data-column");
-        let selectedValue = $(this).val().toLowerCase();
+            // Handle clicking an option in the dropdown to filter data
+            $(".filter-dropdown").on("click", "option", function () {
+                let columnId = $(this).closest(".filter-dropdown").attr("data-column");
+                let selectedValue = $(this).val().toLowerCase();
 
-        // Filter the table based on the selected dropdown option
-        $("#dataTable tbody tr").each(function () {
-        let $row = $(this);
-        let $td = $row.find(`[data-column='${columnId}']`);
-        let isGrandTotal = $row.attr("id") === "grandTotalRow";
+                // Filter the table based on the selected dropdown option
+                $("#dataTable tbody tr").each(function () {
+                    let $row = $(this);
+                    let $td = $row.find(`[data-column='${columnId}']`);
+                    let isGrandTotal = $row.attr("id") === "grandTotalRow";
 
-        if (isGrandTotal) {
-        $row.show();
-        } else if ($td.length) {
-        let textValue = $td.text().toLowerCase();
-        if (selectedValue === "" || textValue.includes(selectedValue)) {
-        $row.show();
-        } else {
-        $row.hide();
-        }
-        }
-        });
+                    if (isGrandTotal) {
+                        $row.show();
+                    } else if ($td.length) {
+                        let textValue = $td.text().toLowerCase();
+                        if (selectedValue === "" || textValue.includes(selectedValue)) {
+                            $row.show();
+                        } else {
+                            $row.hide();
+                        }
+                    }
+                });
 
-        // Disable the filter dropdowns to the left of the selected column
-        let columnIndex = $(".filter-dropdown").index($(this).closest(".filter-dropdown"));
-        $(".filter-dropdown").each(function (index) {
-        if (index < columnIndex) {
-        $(this).prop("disabled", true).find('.optionfilter').css('background-color', '#7b7c7f');
-        } else {
-        $(this).prop("disabled", false);
-        }
-        });
-        });
+                // Disable the filter dropdowns to the left of the selected column
+                let columnIndex = $(".filter-dropdown").index($(this).closest(".filter-dropdown"));
+                $(".filter-dropdown").each(function (index) {
+                    if (index < columnIndex) {
+                        $(this).prop("disabled", true).find('.optionfilter').css('background-color', '#7b7c7f');
+                    } else {
+                        $(this).prop("disabled", false);
+                    }
+                });
+            });
         });
 
     </script>
 
     <script>
         $(document).ready(function () {
-        $("#selectedDate").on("change", function () {
+            $("#selectedDate").on("change", function () {
 
-        let selectedDate = $(this).val();
+                let selectedDate = $(this).val();
 
-        if (!selectedDate) {
-        console.warn("No date selected.");
-        return;
-        }
+                if (!selectedDate) {
+                    console.warn("No date selected.");
+                    return;
+                }
 
-        if ($("#dataTable").length === 0) {
-        alert("Records are not available.");
-        return;
-        }
+                if ($("#dataTable").length === 0) {
+                    alert("Records are not available.");
+                    return;
+                }
 
-        let rowsFound = false;
-        $("#dataTable tbody tr").each(function () {
-        let $row = $(this);
+                let rowsFound = false;
+                $("#dataTable tbody tr").each(function () {
+                    let $row = $(this);
 
-        let timeStamp = $row.find("[data-column='TimeStamp']").text().trim();
-        let dateKey = $row.find("[data-column='DateKey']").text().trim();
-        let formattedTimeStampDate = "";
-        let formattedDateKeyDate = "";
+                    let timeStamp = $row.find("[data-column='TimeStamp']").text().trim();
+                    let dateKey = $row.find("[data-column='DateKey']").text().trim();
+                    let formattedTimeStampDate = "";
+                    let formattedDateKeyDate = "";
 
-        if (timeStamp && timeStamp !== '--') {
-        let datePart = timeStamp.split(" ")[0];
-        formattedTimeStampDate = datePart.replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1");
-        }
+                    if (timeStamp && timeStamp !== '--') {
+                        let datePart = timeStamp.split(" ")[0];
+                        formattedTimeStampDate = datePart.replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1");
+                    }
 
-        if (dateKey && dateKey !== '--') {
-        formattedDateKeyDate = dateKey.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
-        }
+                    if (dateKey && dateKey !== '--') {
+                        formattedDateKeyDate = dateKey.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
+                    }
 
-        if (formattedTimeStampDate === selectedDate || formattedDateKeyDate === selectedDate) {
-        $row.show();
-        rowsFound = true;
-        } else {
-        $row.hide();
-        }
+                    if (formattedTimeStampDate === selectedDate || formattedDateKeyDate === selectedDate) {
+                        $row.show();
+                        rowsFound = true;
+                    } else {
+                        $row.hide();
+                    }
 
-        if ((!formattedTimeStampDate || formattedTimeStampDate === '--') && (!formattedDateKeyDate || formattedDateKeyDate === '--')) {
-        $row.hide();
-        }
-        });
+                    if ((!formattedTimeStampDate || formattedTimeStampDate === '--') && (!formattedDateKeyDate || formattedDateKeyDate === '--')) {
+                        $row.hide();
+                    }
+                });
 
-        if (!rowsFound) {
-        alert("No records available for the selected date.");
-        //refresh();
-        }
-        });
+                if (!rowsFound) {
+                    alert("No records available for the selected date.");
+                    //refresh();
+                }
+            });
         });
     </script>
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-        var colorCode = '@Model.Color';
-        var elements = document.getElementsByClassName('non-fixed-column');
+            var colorCode = '@Model.Color';
+            var elements = document.getElementsByClassName('non-fixed-column');
 
-        for (var i = 0; i < elements.length; i++) {
-        elements[i].style.setProperty('background-color', colorCode, 'important');
-        }
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.setProperty('background-color', colorCode, 'important');
+            }
         });
     </script>
 
@@ -391,107 +391,107 @@
                             r["TM"].ToString() == Model.TotalTM[j]["TM"]?.ToString() && r["MUL_MktMngr"].ToString() == Model.TotalMMM[i]["MUL_MktMngr"]?.ToString()))
                             {
                                 @* <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
-                                    @foreach (var field in orderedColumns)
-                                    {
-                                        <td data-column="@field">
-                                            @if (row.ContainsKey(field))
-                                            {
-                                                var value = row[field];
+                @foreach (var field in orderedColumns)
+                {
+                <td data-column="@field">
+                @if (row.ContainsKey(field))
+                {
+                var value = row[field];
 
-                                                if (Model.NoOfDecimal.ContainsKey(field) && (Model.ColorAliasName.Contains(field)))
-                                                {
-                                                    var decimalPlaces = Model.NoOfDecimal[field];
+                if (Model.NoOfDecimal.ContainsKey(field) && (Model.ColorAliasName.Contains(field)))
+                {
+                var decimalPlaces = Model.NoOfDecimal[field];
 
-                                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
-                                                    {
-                                                        @decimalValue.ToString("F" + decimalPlaces)
-                                                    }
-                                                    else if (value is decimal || value is float || value is double)
-                                                    {
-                                                        @if (Model.ColorAliasName.Contains(field))
-                                                        {
-                                                            //decimal formattedValue = Convert.ToDecimal(value) * 100;
-                                                            string formattedValue = (Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces);
-                                                            decimal formattedDecimalValue = Convert.ToDecimal(formattedValue);
+                if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                {
+                @decimalValue.ToString("F" + decimalPlaces)
+                }
+                else if (value is decimal || value is float || value is double)
+                {
+                @if (Model.ColorAliasName.Contains(field))
+                {
+                //decimal formattedValue = Convert.ToDecimal(value) * 100;
+                string formattedValue = (Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces);
+                decimal formattedDecimalValue = Convert.ToDecimal(formattedValue);
 
-                                                            var backgroundColor = "transparent";
+                var backgroundColor = "transparent";
 
-                                                            if (formattedDecimalValue < (decimal)Model.ColorValue1)
-                                                            {
-                                                                backgroundColor = Model.ColorCode1;
-                                                            }
-                                                            else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && (formattedDecimalValue < (decimal)Model.ColorValue2))
-                                                            {
-                                                                backgroundColor = Model.ColorCode2;
-                                                            }
-                                                            else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && (formattedDecimalValue < (decimal)Model.ColorValue3))
-                                                            {
-                                                                backgroundColor = Model.ColorCode3;
-                                                            }
-                                                            //@formattedValue.ToString("F" + decimalPlaces)
-                                                            <div style="background-color: @backgroundColor; height:fit-content;">
-                                                                @($"{formattedValue} %")
-                                                            </div>
-                                                        }
-                                                        else
-                                                        {
-                                                            @((Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces) + " %")
-                                                        }
-                                                    }
-                                                    else
-                                                    {
-                                                        @value
-                                                    }
-                                                }
-                                                else if (Model.ColorAliasName.Contains(field))
-                                                {
-                                                    //decimal formattedValue = Convert.ToInt32(value) * 10;
-                                                    string formattedValue = (Convert.ToDecimal(value) * 100).ToString("F" + 1);
-                                                    decimal formattedDecimalValue = Convert.ToDecimal(formattedValue);
+                if (formattedDecimalValue < (decimal)Model.ColorValue1)
+                {
+                backgroundColor = Model.ColorCode1;
+                }
+                else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && (formattedDecimalValue < (decimal)Model.ColorValue2))
+                {
+                backgroundColor = Model.ColorCode2;
+                }
+                else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && (formattedDecimalValue < (decimal)Model.ColorValue3))
+                {
+                backgroundColor = Model.ColorCode3;
+                }
+                //@formattedValue.ToString("F" + decimalPlaces)
+                <div style="background-color: @backgroundColor; height:fit-content;">
+                @($"{formattedValue} %")
+                </div>
+                }
+                else
+                {
+                @((Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces) + " %")
+                }
+                }
+                else
+                {
+                @value
+                }
+                }
+                else if (Model.ColorAliasName.Contains(field))
+                {
+                //decimal formattedValue = Convert.ToInt32(value) * 10;
+                string formattedValue = (Convert.ToDecimal(value) * 100).ToString("F" + 1);
+                decimal formattedDecimalValue = Convert.ToDecimal(formattedValue);
 
-                                                    var backgroundColor = "transparent";
+                var backgroundColor = "transparent";
 
-                                                    if (formattedDecimalValue < (decimal)Model.ColorValue1)
-                                                    {
-                                                        backgroundColor = Model.ColorCode1;
-                                                    }
-                                                    else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && (formattedDecimalValue < (decimal)Model.ColorValue2))
-                                                    {
-                                                        backgroundColor = Model.ColorCode2;
-                                                    }
-                                                    else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && (formattedDecimalValue < (decimal)Model.ColorValue3))
-                                                    {
-                                                        backgroundColor = Model.ColorCode3;
-                                                    }
-                                                    //@formattedValue.ToString("F" + decimalPlaces)
-                                                    <div style="background-color: @backgroundColor; height:fit-content;">
-                                                        @($"{formattedValue} %")
-                                                    </div>
-                                                }
-                                                else if (value is decimal || value is float || value is double)
-                                                {
-                                                    if (Convert.ToDecimal(value) < 1 && Convert.ToDecimal(value) > 0)
-                                                    {
-                                                        @((Convert.ToDecimal(value) * 100).ToString("F" + 1) + " %")
-                                                    }
-                                                    else
-                                                    { 
-                                                        @Convert.ToInt32(value).ToString()
-                                                    }
+                if (formattedDecimalValue < (decimal)Model.ColorValue1)
+                {
+                backgroundColor = Model.ColorCode1;
+                }
+                else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && (formattedDecimalValue < (decimal)Model.ColorValue2))
+                {
+                backgroundColor = Model.ColorCode2;
+                }
+                else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && (formattedDecimalValue < (decimal)Model.ColorValue3))
+                {
+                backgroundColor = Model.ColorCode3;
+                }
+                //@formattedValue.ToString("F" + decimalPlaces)
+                <div style="background-color: @backgroundColor; height:fit-content;">
+                @($"{formattedValue} %")
+                </div>
+                }
+                else if (value is decimal || value is float || value is double)
+                {
+                if (Convert.ToDecimal(value) < 1 && Convert.ToDecimal(value) > 0)
+                {
+                @((Convert.ToDecimal(value) * 100).ToString("F" + 1) + " %")
+                }
+                else
+                {
+                @Convert.ToInt32(value).ToString()
+                }
 
-                                                }
-                                                else
-                                                {
-                                                    @value
-                                                }
-                                            }
-                                            else
-                                            {
-                                                @(" ")
-                                            }
-                                        </td>
-                                    }
-                                </tr> *@
+                }
+                else
+                {
+                @value
+                }
+                }
+                else
+                {
+                @(" ")
+                }
+                </td>
+                }
+                </tr> *@
 
                                 <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
                                     @foreach (var field in orderedColumns)
