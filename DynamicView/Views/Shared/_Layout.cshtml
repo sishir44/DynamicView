@@ -66,7 +66,7 @@
             </div>
         </nav>
 
-        <div class="row filterClass">
+        @* <div class="row filterClass">
             <div class="row mt-1 searchBarFilter">
                 <div class="row">
                     @foreach (var column in Model.isFilterCol as List<string>)
@@ -104,7 +104,56 @@
                     </div>
                 }
             </div>
+        </div> *@
+
+        <div class="row filterClass mt-1">
+
+            <div class="col-lg-1 col-md-2 col-sm-12 col-xs-12 RptCol">
+                <div class="maindiv">
+                    <label>Total Stores</label>
+                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="">
+
+                    <label>100% &amp; Above</label>
+                    <input type="button" name=">100" id="tbeCountDisplay" class="form-control" title="100% &amp; Above" value="">
+                </div>
+            </div>
+            <div class="col-lg-1 col-md-2 col-sm-12 col-xs-12 RptCol">
+                <div class="maindiv">
+                    <label>Total Stores</label>
+                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="">
+
+                    <label>100% &amp; Above</label>
+                    <input type="button" name=">100" id="tbeCountDisplay" class="form-control" title="100% &amp; Above" value="">
+                </div>
+            </div>
+
+
+            @foreach (var column in Model.isFilterCol as List<string>)
+            {
+                var columnId = column.Replace(" ", ""); // Remove spaces to create valid IDs
+                <div class="col-sm-2">
+                    <!-- Input Textbox -->
+                    <input type="text"
+                           name="textSearch@columnId"
+                           id="textSearch@columnId"
+                           class="selectorinput form-control"
+                           placeholder="Search @column..."
+                           data-column="@columnId" />
+
+                    <!-- Dropdown -->
+                    <select class="form-control filter-dropdown mt-1" id="dropdown_@columnId" size="5" data-column="@columnId">
+                        @foreach (var value in Model.TableData
+                       .Where(data => data.ContainsKey(column))
+                       .Select(data => data[column]?.ToString())
+                       .Distinct())
+                        {
+                            <option class="optionfilter" style="background-color: @Model.Color;" value="@value" title="@value">@value</option>
+                        }
+                    </select>
+                </div>
+            }
         </div>
+
 
         @* Mobile Dropdown *@
         <div class="container dropdownSearchBar">

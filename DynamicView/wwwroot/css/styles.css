@@ -41,6 +41,8 @@
 
 .filterClass {
     background-color: white !important;
+    margin-left:1px;
+    margin-right: -1px;
 }
 
 .searchBarFilter .col-md-2,
@@ -96,6 +98,33 @@ tbody, tr, td {
     text-align: center;
     vertical-align: middle;
 }
+
+/* Total Report Display Start*/
+.RptCol {
+    font-size: 12px;
+    display: inline-block;
+    
+}
+
+.maindiv input.form-control {
+    font-size: 10px;
+    height: 20px;
+    margin-bottom: 10px;
+    padding: 0px 0 !important;
+    width:50px;
+}
+
+#storeCountDisplay {
+    background-color: #31869b;
+    color: white;
+}
+
+#tbeCountDisplay {
+    background-color: green;
+    color: white;
+}
+/* Total Report Display End*/
+
 
 .optionfilter {
     font-size: 10px;
