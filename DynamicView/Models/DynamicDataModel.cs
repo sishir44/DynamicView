@@ -9,6 +9,7 @@ namespace DynamicView.Models
         public List<string> isFilterCol { get; set; }
         public List<string> isSubTotalCol { get; set; }
         public Dictionary<string, short?> NoOfDecimal { get; set; }
+        public Dictionary<string, bool?> ShowCard { get; set; }
         public Dictionary<string, bool?> isPercentorRatio { get; set; }
         public List<Dictionary<string, object>> TableData { get; set; }
         public List<Dictionary<string, object>> TotalSum { get; set; }
@@ -22,6 +23,10 @@ namespace DynamicView.Models
         public bool isMobile { get; set; }
         public List<string> firstRowColumn { get; set; }
         
+        public int TotalCount { get; set; }
+        public int ColorCodeCnt1 { get; set; }
+        public int ColorCodeCnt2 { get; set; }
+        public int ColorCodeCnt3 { get; set; }
 
 
 

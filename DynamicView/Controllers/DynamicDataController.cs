@@ -52,6 +52,7 @@ public class DynamicDataController : Controller
             var sevenTable = result.resultSet7[0]; // No of Decimal
             var eightTable = result.resultSet8[0]; // No of Decimal
             var nineTable = result.resultSet9[0]; // percentage ratio 
+            var ShowCardTbl = result.resultSet10[0]; // showCard for grand Total
 
             var firstRow = firstTable?.Rows.Cast<DataRow>().FirstOrDefault();
             // get col header, data and color
@@ -171,19 +172,8 @@ public class DynamicDataController : Controller
             }
             if (result.resultSet8 != null && result.resultSet8.Count > 0)
             {
-               
-
                 foreach (DataRow row in eightTable.Rows)
                 {
-                    // Access column values for the current row and assign them to the model
-                    //model.ColorValue1 = row["ColorValue1"] != DBNull.Value ? row["ColorValue1"].ToString(): null;
-                    //model.ColorCode1 = row["ColorCode1"] != DBNull.Value ? row["ColorCode1"].ToString() : null;
-                    //model.ColorValue2 = row["ColorValue2"] != DBNull.Value ? row["ColorValue2"].ToString() : null;
-                    //model.ColorCode2 = row["ColorCode2"] != DBNull.Value ? row["ColorCode2"].ToString() : null;
-                    //model.ColorValue3 = row["ColorValue3"] != DBNull.Value ? row["ColorValue3"].ToString() : null;
-                    //model.ColorCode3 = row["ColorCode3"] != DBNull.Value ? row["ColorCode3"].ToString() : null;
-
-
                     model.ColorValue1 = row["ColorValue1"] != DBNull.Value ? Convert.ToSingle(row["ColorValue1"]) : 0f;
                     model.ColorCode1 = row["ColorCode1"] != DBNull.Value ? row["ColorCode1"].ToString() : null;
 
@@ -206,6 +196,16 @@ public class DynamicDataController : Controller
                             }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.isPercentorRatio);
             }
 
+            //show card for grand total
+            if (ShowCardTbl != null)
+            {
+                model.ShowCard = ShowCardTbl.AsEnumerable().Where(row => row.Field<bool?>("ShowCard") == true)
+                            .Select(row => new
+                            {
+                                Alias = row["Alias"]?.ToString().Trim('[', ']'),
+                                ShowCard = row.Field<bool?>("ShowCard")
+                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.ShowCard);
+            }
 
             // Generate alphabetic column names
             int NumberOfColumns = model.FieldNames.Count;
@@ -260,3 +260,4 @@ public class DynamicDataController : Controller
         return userAgent.Contains("Mobi") || userAgent.Contains("Android") || userAgent.Contains("IPhone");
     }
 }
+

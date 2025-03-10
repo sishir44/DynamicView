@@ -14,6 +14,14 @@
 
 }
 
+@* @{
+    var TotalCount = 0;
+    var ColorCodeCnt1 = 0;
+    var ColorCodeCnt2 = 0;
+    var ColorCodeCnt3 = 0;
+} *@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -208,46 +216,48 @@
                                 @if (row.ContainsKey(field.column))
                                 {
                                     var value = row[field.column];
-
-                                    if (Model.NoOfDecimal.ContainsKey(field.column))
+                                    if (Model.ShowCard.ContainsKey(field.column))
                                     {
-                                        var decimalPlaces = Model.NoOfDecimal[field.column];
-
-                                        if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                        if (Model.NoOfDecimal.ContainsKey(field.column))
                                         {
-                                            @decimalValue.ToString("F" + decimalPlaces)
+                                            var decimalPlaces = Model.NoOfDecimal[field.column];
+
+                                            if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                            {
+                                                @decimalValue.ToString("F" + decimalPlaces)
+                                            }
+                                            else if (value is decimal || value is float || value is double)
+                                            {
+                                                if (isPercentColumn)
+                                                {
+                                                    @((Convert.ToDecimal(row[field.column]) * 100).ToString("F" + decimalPlaces) + " %")
+                                                }
+                                                else
+                                                {
+                                                    @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                                }
+                                            }
+                                            else
+                                            {
+                                                @value
+                                            }
                                         }
                                         else if (value is decimal || value is float || value is double)
                                         {
                                             if (isPercentColumn)
                                             {
-                                                @((Convert.ToDecimal(row[field.column]) * 100).ToString("F" + decimalPlaces) + " %")
+                                                @((Convert.ToDecimal(row[field.column]) * 100).ToString("F" + 1) + " %")
                                             }
                                             else
                                             {
-                                                @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                                //@((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
+                                                @Convert.ToInt32(value).ToString()
                                             }
                                         }
                                         else
                                         {
                                             @value
                                         }
-                                    }
-                                    else if (value is decimal || value is float || value is double)
-                                    {
-                                        if (isPercentColumn)
-                                        {
-                                            @((Convert.ToDecimal(row[field.column]) * 100).ToString("F" + 1) + " %")
-                                        }
-                                        else
-                                        {
-                                            //@((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
-                                            @Convert.ToInt32(value).ToString()
-                                        }
-                                    }
-                                    else
-                                    {
-                                        @value
                                     }
                                 }
                                 else if (field.index == 3)
@@ -256,7 +266,7 @@
                                 }
                                 else
                                 {
-                                    @("--")
+                                    @("")
                                 }
                             </td>
                         }
@@ -394,115 +404,14 @@
                                 foreach (var row in Model.TableData.Where(r => r.ContainsKey("TM") && !string.IsNullOrEmpty(r["TM"]?.ToString()) && r.ContainsKey("MUL_MktMngr") && !string.IsNullOrEmpty(r["MUL_MktMngr"]?.ToString()) &&
                                 r["TM"].ToString() == Model.TotalTM[j]["TM"]?.ToString() && r["MUL_MktMngr"].ToString() == Model.TotalMMM[i]["MUL_MktMngr"]?.ToString()))
                                 {
-                                    @* <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
-                @foreach (var field in orderedColumns)
-                {
-                <td data-column="@field">
-                @if (row.ContainsKey(field))
-                {
-                var value = row[field];
-
-                if (Model.NoOfDecimal.ContainsKey(field) && (Model.ColorAliasName.Contains(field)))
-                {
-                var decimalPlaces = Model.NoOfDecimal[field];
-
-                if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
-                {
-                @decimalValue.ToString("F" + decimalPlaces)
-                }
-                else if (value is decimal || value is float || value is double)
-                {
-                @if (Model.ColorAliasName.Contains(field))
-                {
-                //decimal formattedValue = Convert.ToDecimal(value) * 100;
-                string formattedValue = (Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces);
-                decimal formattedDecimalValue = Convert.ToDecimal(formattedValue);
-
-                var backgroundColor = "transparent";
-
-                if (formattedDecimalValue < (decimal)Model.ColorValue1)
-                {
-                backgroundColor = Model.ColorCode1;
-                }
-                else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && (formattedDecimalValue < (decimal)Model.ColorValue2))
-                {
-                backgroundColor = Model.ColorCode2;
-                }
-                else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && (formattedDecimalValue < (decimal)Model.ColorValue3))
-                {
-                backgroundColor = Model.ColorCode3;
-                }
-                //@formattedValue.ToString("F" + decimalPlaces)
-                <div style="background-color: @backgroundColor; height:fit-content;">
-                @($"{formattedValue} %")
-                </div>
-                }
-                else
-                {
-                @((Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces) + " %")
-                }
-                }
-                else
-                {
-                @value
-                }
-                }
-                else if (Model.ColorAliasName.Contains(field))
-                {
-                //decimal formattedValue = Convert.ToInt32(value) * 10;
-                string formattedValue = (Convert.ToDecimal(value) * 100).ToString("F" + 1);
-                decimal formattedDecimalValue = Convert.ToDecimal(formattedValue);
-
-                var backgroundColor = "transparent";
-
-                if (formattedDecimalValue < (decimal)Model.ColorValue1)
-                {
-                backgroundColor = Model.ColorCode1;
-                }
-                else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && (formattedDecimalValue < (decimal)Model.ColorValue2))
-                {
-                backgroundColor = Model.ColorCode2;
-                }
-                else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && (formattedDecimalValue < (decimal)Model.ColorValue3))
-                {
-                backgroundColor = Model.ColorCode3;
-                }
-                //@formattedValue.ToString("F" + decimalPlaces)
-                <div style="background-color: @backgroundColor; height:fit-content;">
-                @($"{formattedValue} %")
-                </div>
-                }
-                else if (value is decimal || value is float || value is double)
-                {
-                if (Convert.ToDecimal(value) < 1 && Convert.ToDecimal(value) > 0)
-                {
-                @((Convert.ToDecimal(value) * 100).ToString("F" + 1) + " %")
-                }
-                else
-                {
-                @Convert.ToInt32(value).ToString()
-                }
-
-                }
-                else
-                {
-                @value
-                }
-                }
-                else
-                {
-                @(" ")
-                }
-                </td>
-                }
-                </tr> *@
-
                                     <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
                                         @foreach (var field in orderedColumns)
                                         {
                                             var backgroundColor = "transparent"; // Default background color
                                             var formattedValue = ""; // Default value display
                                             decimal formattedDecimalValue;
+
+
 
                                             if (row.ContainsKey(field))
                                             {
@@ -538,14 +447,17 @@
                                                         if (formattedDecimalValue < (decimal)Model.ColorValue1)
                                                         {
                                                             backgroundColor = Model.ColorCode1;
+                                                            //ColorCodeCnt1 += 1;
                                                         }
                                                         else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && formattedDecimalValue < (decimal)Model.ColorValue2)
                                                         {
                                                             backgroundColor = Model.ColorCode2;
+                                                           // ColorCodeCnt2 += 1;
                                                         }
                                                         else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && formattedDecimalValue < (decimal)Model.ColorValue3)
                                                         {
                                                             backgroundColor = Model.ColorCode3;
+                                                            //ColorCodeCnt3 += 1;
                                                         }
                                                     }
                                                     else
@@ -596,14 +508,17 @@
                                                     if (formattedDecimalValue < (decimal)Model.ColorValue1)
                                                     {
                                                         backgroundColor = Model.ColorCode1;
+                                                        //ColorCodeCnt1 += 1;
                                                     }
                                                     else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && formattedDecimalValue < (decimal)Model.ColorValue2)
                                                     {
                                                         backgroundColor = Model.ColorCode2;
+                                                        //ColorCodeCnt2 += 1;
                                                     }
                                                     else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && formattedDecimalValue < (decimal)Model.ColorValue3)
                                                     {
                                                         backgroundColor = Model.ColorCode3;
+                                                        //ColorCodeCnt3 += 1;
                                                     }
                                                 }
                                                 else if (value is decimal || value is float || value is double)
@@ -629,6 +544,8 @@
                                                         formattedValue = value.ToString();
                                                     }
                                                 }
+                                                //TotalCount += 1;
+
                                             }
                                             else
                                             {
@@ -696,6 +613,16 @@
         </table>
     </div>
 
+    <!-- Form to submit the counts to the controller -->
+ @*    @using (Html.BeginForm("ColorCount", "DynamicData", FormMethod.Post))
+    {
+        <input type="hidden" name="TotalCount" value="@TotalCount" />
+        <input type="hidden" name="ColorCodeCnt1" value="@ColorCodeCnt1" />
+        <input type="hidden" name="ColorCodeCnt2" value="@ColorCodeCnt2" />
+        <input type="hidden" name="ColorCodeCnt3" value="@ColorCodeCnt3" />
+
+        <input type="submit" value="Submit Counts" />
+    } *@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -762,9 +689,6 @@
         });
 
     </script>
-
-
-
 
 </body>
 </html>

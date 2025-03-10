@@ -1,5 +1,14 @@
 ﻿@model DynamicView.Models.DynamicDataModel
 
+@* @{
+    var TotalCount = TempData["TotalCount"];
+    var ColorCodeCnt1 = TempData["ColorCodeCnt1"];
+    var ColorCodeCnt2 = TempData["ColorCodeCnt2"];
+    var ColorCodeCnt3 = TempData["ColorCodeCnt3"];
+} *@
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,7 +25,6 @@
     <script>
         
         </script>
-
 
 </head>
 <body>
@@ -111,19 +119,19 @@
             <div class="col-lg-1 col-md-2 col-sm-12 col-xs-12 RptCol">
                 <div class="maindiv">
                     <label>Total Stores</label>
-                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="">
+                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="0">
 
                     <label>100% &amp; Above</label>
-                    <input type="button" name=">100" id="tbeCountDisplay" class="form-control" title="100% &amp; Above" value="">
+                    <input type="button" name=">100" id="tbeCountDisplay" class="form-control" title="100% &amp; Above" value="0">
                 </div>
             </div>
             <div class="col-lg-1 col-md-2 col-sm-12 col-xs-12 RptCol">
                 <div class="maindiv">
-                    <label>Total Stores</label>
-                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="">
+                    <label>70 & Above</label>
+                    <input type="button" name="GAGoals" id="storeCountDisplay1" class="form-control" value="0">
 
-                    <label>100% &amp; Above</label>
-                    <input type="button" name=">100" id="tbeCountDisplay" class="form-control" title="100% &amp; Above" value="">
+                    <label>Less Than 70</label>
+                    <input type="button" name=">100" id="tbeCountDisplay1" class="form-control" title="" value="0">
                 </div>
             </div>
 

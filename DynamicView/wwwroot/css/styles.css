@@ -69,7 +69,7 @@ table {
     table-layout: auto; /* Allow columns to adjust width dynamically */
     /* border-collapse: collapse; */
     border-collapse: separate;
-    margin-top: 135px;
+    margin-top: 105px;
 }
 
 th {
@@ -118,9 +118,17 @@ tbody, tr, td {
     background-color: #31869b;
     color: white;
 }
+#storeCountDisplay1 {
+    background-color: blue;
+    color: white;
+}
 
 #tbeCountDisplay {
     background-color: green;
+    color: white;
+}
+#tbeCountDisplay1 {
+    background-color: orange;
     color: white;
 }
 /* Total Report Display End*/
