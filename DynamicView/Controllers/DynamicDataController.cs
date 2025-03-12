@@ -12,7 +12,7 @@ public class DynamicDataController : Controller
         _dbService = dbService;
     }
 
-    public async Task<IActionResult> Index(int reportId = 1)
+    public async Task<IActionResult> Index(int reportId = 3)
     {
         DynamicDataModel model = new DynamicDataModel();
 
@@ -50,7 +50,7 @@ public class DynamicDataController : Controller
             var fifthTable = result.resultSet5[0];  // isFilter
             var sixthTable = result.resultSet6[0]; // subtotal
             var sevenTable = result.resultSet7[0]; // No of Decimal
-            var eightTable = result.resultSet8[0]; // No of Decimal
+            var eightTable = result.resultSet8[0]; // color code
             var nineTable = result.resultSet9[0]; // percentage ratio 
             var ShowCardTbl = result.resultSet10[0]; // showCard for grand Total
 
@@ -76,12 +76,18 @@ public class DynamicDataController : Controller
                 if (firstRow.Table.Columns.Contains("GrandTotalProc"))
                 {
                     var totalCountProc = firstRow["GrandTotalProc"]?.ToString();
-                    var parameters = new Dictionary<string, object>();
-                    foreach (DataColumn column in firstRow.Table.Columns)
+                    
+                    if (totalCountProc != "N/A" || totalCountProc == "")
                     {
-                        parameters[column.ColumnName] = firstRow[column.ColumnName];
+                        var parameters = new Dictionary<string, object>();
+
+                        foreach (DataColumn column in firstRow.Table.Columns)
+                        {
+                            parameters[column.ColumnName] = firstRow[column.ColumnName];
+                        }
+                        model.TotalSum = await _dbService.TotalAsync(totalCountProc, parameters);
                     }
-                    model.TotalSum = await _dbService.TotalAsync(totalCountProc, parameters);
+
                 }
             }
 
@@ -174,26 +180,26 @@ public class DynamicDataController : Controller
             {
                 foreach (DataRow row in eightTable.Rows)
                 {
-                    model.ColorValue1 = row["ColorValue1"] != DBNull.Value ? Convert.ToSingle(row["ColorValue1"]) : 0f;
-                    model.ColorCode1 = row["ColorCode1"] != DBNull.Value ? row["ColorCode1"].ToString() : null;
+                    model.ColorValue1 = row["ColorCode1"] != DBNull.Value ? Convert.ToSingle(row["ColorCode1"]) : 0f;
+                    model.ColorCode1 = row["ColorValue1"] != DBNull.Value ? row["ColorValue1"].ToString() : null;
 
-                    model.ColorValue2 = row["ColorValue2"] != DBNull.Value ? Convert.ToSingle(row["ColorValue2"]) : 0f;  // Assigning default value of 0 if DBNull
-                    model.ColorCode2 = row["ColorCode2"] != DBNull.Value ? row["ColorCode2"].ToString() : null;
+                    model.ColorValue2 = row["ColorCode2"] != DBNull.Value ? Convert.ToSingle(row["ColorCode2"]) : 0f;  // Assigning default value of 0 if DBNull
+                    model.ColorCode2 = row["ColorValue2"] != DBNull.Value ? row["ColorValue2"].ToString() : null;
 
-                    model.ColorValue3 = row["ColorValue3"] != DBNull.Value ? Convert.ToSingle(row["ColorValue3"]) : 0f;  // Assigning default value of 0 if DBNull
-                    model.ColorCode3 = row["ColorCode3"] != DBNull.Value ? row["ColorCode3"].ToString() : null;
+                    model.ColorValue3 = row["ColorCode3"] != DBNull.Value ? Convert.ToSingle(row["ColorCode3"]) : 0f;  // Assigning default value of 0 if DBNull
+                    model.ColorCode3 = row["ColorValue3"] != DBNull.Value ? row["ColorValue3"].ToString() : null;
                 }
             }
 
             // Percentage Rtaio
             if (nineTable != null)
             {
-                model.isPercentorRatio = nineTable.AsEnumerable().Where(row => row.Field<bool?>("isPercentorRatio") == true)
+                model.isPercent = nineTable.AsEnumerable().Where(row => row.Field<bool?>("isPercent") == true)
                             .Select(row => new
                             {
                                 Alias = row["Alias"]?.ToString().Trim('[', ']'),
-                                isPercentorRatio = row.Field<bool?>("isPercentorRatio")
-                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.isPercentorRatio);
+                                isPercent = row.Field<bool?>("isPercent")
+                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.isPercent);
             }
 
             //show card for grand total
