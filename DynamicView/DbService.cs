@@ -218,7 +218,7 @@ public class DbService
                 }
                 if (storedProcName.Equals("GetFct_My_MTDMMMRank", StringComparison.OrdinalIgnoreCase))
                 {
-                    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2024, 11, 13) });
+                    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 3, 7) });
                 }
 
                 await conn.OpenAsync();
@@ -396,9 +396,12 @@ public class DbService
                     DateTime defaultDate = storedProcName switch
                     {
                         "GetFct_EmployeeNumberTotal" => new DateTime(2024, 12, 3),
+                        "Dyn_GetFct_EmployeeNumberTotal" => new DateTime(2024, 12, 3),
                         "GetRecords_summaryTotal" => new DateTime(2024, 12, 26),
                         "GetFct_MMMRankTotal" => new DateTime(2025, 2, 11),
-                        "GetFct_StoreNumberTotal" => new DateTime(2025, 2, 11),
+                        "Dyn_GetFct_MMMRankTotal" => new DateTime(2025, 3, 7),
+                        "GetFct_StoreNumberTotal" => new DateTime(2025, 3, 7),
+                        "Dyn_GetFct_StoreNumberTotal" => new DateTime(2025, 2, 11),
                         _ => DateTime.MinValue  // Default if no match
                     };
 

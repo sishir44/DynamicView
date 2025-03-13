@@ -4,6 +4,7 @@ namespace DynamicView.Models
     public class DynamicDataModel
     {
         public List<string> FieldNames { get; set; }
+        public List<string> FieldNamesAlias { get; set; }
         public List<string> isFixedCol { get; set; }
         public List<string> isFixedM { get; set; }
         public List<string> isFilterCol { get; set; }

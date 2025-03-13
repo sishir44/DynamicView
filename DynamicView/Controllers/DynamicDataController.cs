@@ -44,7 +44,7 @@ public class DynamicDataController : Controller
 
             var result = _dbService.GetDynamicReportNew(reportId);
             var firstTable = result.resultSet1[0]; // data col header and color
-            var secondTable = result.resultSet2[0]; // alias name for col
+            var secondTable = result.resultSet2[0]; // AttributeName, alisa name for col
             var thirdTable = result.resultSet3[0]; // isFixed for Desktop
             var fourthTable = result.resultSet4[0]; // is Fixed for Mobile
             var fifthTable = result.resultSet5[0];  // isFilter
@@ -91,10 +91,12 @@ public class DynamicDataController : Controller
                 }
             }
 
-            // get the alias name for table
+            // get the AttributeName name for table
             if (secondTable != null)
             {
-                model.FieldNames = secondTable.Columns.Contains("Alias") ? secondTable.AsEnumerable().Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                model.FieldNames = secondTable.Columns.Contains("AttributeName") ? secondTable.AsEnumerable().Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                                  .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
+                model.FieldNamesAlias = secondTable.Columns.Contains("Alias") ? secondTable.AsEnumerable().Select(row => row["Alias"]?.ToString().Trim('[', ']'))
                                   .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
             }
 
@@ -104,7 +106,7 @@ public class DynamicDataController : Controller
                 if (thirdTable != null)
                 {
                     model.isFixedCol = thirdTable.AsEnumerable()
-                                     .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                     .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
                                      .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
                 }
             }
@@ -114,7 +116,7 @@ public class DynamicDataController : Controller
                 if (fourthTable != null)
                 {
                     model.isFixedCol = fourthTable.AsEnumerable()
-                                     .Where(row => row.Field<bool?>("isFixedM") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                     .Where(row => row.Field<bool?>("isFixedM") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
                                      .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
                 }
             }
@@ -122,7 +124,7 @@ public class DynamicDataController : Controller
             if (fifthTable != null)
             {
                 model.isFilterCol = fifthTable.AsEnumerable()
-                                 .Where(row => row.Field<bool?>("isFilter") == true).Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                                 .Where(row => row.Field<bool?>("isFilter") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
                                  .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
             }
             // sub total
@@ -165,15 +167,15 @@ public class DynamicDataController : Controller
                 model.NoOfDecimal = sevenTable.AsEnumerable().Where(row => row.Field<short?>("NoOfDecimal") > 0)
                             .Select(row => new
                             {
-                                Alias = row["Alias"]?.ToString().Trim('[', ']'),
+                                AttributeName = row["AttributeName"]?.ToString().Trim('[', ']'),
                                 NoOfDecimal = row.Field<short?>("NoOfDecimal")
-                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.NoOfDecimal);
+                            }).Where(result => !string.IsNullOrEmpty(result.AttributeName)).ToDictionary(result => result.AttributeName, result => result.NoOfDecimal);
             }
 
             // color column and data
             if (eightTable != null)
             {
-                model.ColorAliasName = eightTable.Columns.Contains("Alias") ? eightTable.AsEnumerable().Select(row => row["Alias"]?.ToString().Trim('[', ']'))
+                model.ColorAliasName = eightTable.Columns.Contains("AttributeName") ? eightTable.AsEnumerable().Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
                                   .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
             }
             if (result.resultSet8 != null && result.resultSet8.Count > 0)
@@ -197,9 +199,9 @@ public class DynamicDataController : Controller
                 model.isPercent = nineTable.AsEnumerable().Where(row => row.Field<bool?>("isPercent") == true)
                             .Select(row => new
                             {
-                                Alias = row["Alias"]?.ToString().Trim('[', ']'),
+                                AttributeName = row["AttributeName"]?.ToString().Trim('[', ']'),
                                 isPercent = row.Field<bool?>("isPercent")
-                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.isPercent);
+                            }).Where(result => !string.IsNullOrEmpty(result.AttributeName)).ToDictionary(result => result.AttributeName, result => result.isPercent);
             }
 
             //show card for grand total
@@ -208,9 +210,9 @@ public class DynamicDataController : Controller
                 model.ShowCard = ShowCardTbl.AsEnumerable().Where(row => row.Field<bool?>("ShowCard") == true)
                             .Select(row => new
                             {
-                                Alias = row["Alias"]?.ToString().Trim('[', ']'),
+                                AttributeName = row["AttributeName"]?.ToString().Trim('[', ']'),
                                 ShowCard = row.Field<bool?>("ShowCard")
-                            }).Where(result => !string.IsNullOrEmpty(result.Alias)).ToDictionary(result => result.Alias, result => result.ShowCard);
+                            }).Where(result => !string.IsNullOrEmpty(result.AttributeName)).ToDictionary(result => result.AttributeName, result => result.ShowCard);
             }
 
             // Generate alphabetic column names

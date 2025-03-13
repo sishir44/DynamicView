@@ -8,8 +8,13 @@
     var fixedColumns = Model.FieldNames.Where(field => Model.isFixedCol.Contains(field)).ToList();
     var remainingColumns = Model.FieldNames.Where(field => !Model.isFixedCol.Contains(field)).ToList();
     var orderedColumns = fixedColumns.Concat(remainingColumns).ToList();
-    var isFixedColPresent = fixedColumns.Any(); // Check if fixed columns exist
-    var rowIndex = 0; // Track the row index for alternating colors
+
+    var fixedColumnsAlias = Model.FieldNamesAlias.Where(field => Model.isFixedCol.Contains(field)).ToList();
+    var remainingColumnsAlias = Model.FieldNamesAlias.Where(field => !Model.isFixedCol.Contains(field)).ToList();
+    var orderedColumnsAlias = fixedColumnsAlias.Concat(remainingColumnsAlias).ToList();
+
+    var isFixedColPresent = fixedColumns.Any(); 
+    var rowIndex = 0; 
 
 
 }
@@ -197,9 +202,11 @@
                     }
                 </tr>
                 <tr>
-                    @foreach (var field in orderedColumns)
+                    @* @foreach (var field in orderedColumns) *@
+                    @foreach (var field in orderedColumnsAlias)
                     {
-                        var isFixed = fixedColumns.Contains(field); // Check if the column is fixed
+                        //var isFixed = fixedColumns.Contains(field); // Check if the column is fixed
+                        var isFixed = fixedColumnsAlias.Contains(field); // Check if the column is fixed
                         var className = isFixed ? "fixed-column" : "non-fixed-column";
                         <th class="@className">@field</th>
                     }
