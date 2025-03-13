@@ -203,22 +203,44 @@ public class DbService
             {
                 cmd.CommandType = CommandType.StoredProcedure;
 
+                //if (storedProcName.Equals("GETMTDEmployee", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    cmd.Parameters.Add(new SqlParameter("@userID", SqlDbType.Int) { Value = 1 });
+                //    cmd.Parameters.Add(new SqlParameter("@date", SqlDbType.Date) { Value = DBNull.Value });
+                //}
+                //if (storedProcName.Equals("GetFct_My_MTDStoreRankupdated", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 24) });
+                //}
+                //if (storedProcName.Equals("GetFct_My_MTDTMRank", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 24) });
+                //}
+                //if (storedProcName.Equals("GetFct_My_MTDMMMRank", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 3, 7) });
+                //}
+                //if (storedProcName.Equals("GetFct_Summary", StringComparison.OrdinalIgnoreCase))
+                //{
+                //    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 2) });
+                //}
+                DateTime defaultDate = storedProcName switch
+                {
+                    "GetFct_My_MTDStoreRankupdated" => new DateTime(2025, 2, 24),
+                    "GetFct_My_MTDTMRank" => new DateTime(2025, 2, 24),
+                    "GetFct_My_MTDMMMRank" => new DateTime(2025, 3, 7),
+                    "GetFct_Summary" => new DateTime(2025, 2, 2),
+                    "Dyn_GetFct_Summary" => new DateTime(2025, 2, 2),
+                    _ => DateTime.MinValue  // Default if no match
+                };
+                if (defaultDate != DateTime.MinValue)
+                {
+                    cmd.Parameters.AddWithValue("@DateParam", defaultDate);
+                }
                 if (storedProcName.Equals("GETMTDEmployee", StringComparison.OrdinalIgnoreCase))
                 {
                     cmd.Parameters.Add(new SqlParameter("@userID", SqlDbType.Int) { Value = 1 });
                     cmd.Parameters.Add(new SqlParameter("@date", SqlDbType.Date) { Value = DBNull.Value });
-                }
-                if (storedProcName.Equals("GetFct_My_MTDStoreRankupdated", StringComparison.OrdinalIgnoreCase))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 24) });
-                }
-                if (storedProcName.Equals("GetFct_My_MTDTMRank", StringComparison.OrdinalIgnoreCase))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 24) });
-                }
-                if (storedProcName.Equals("GetFct_My_MTDMMMRank", StringComparison.OrdinalIgnoreCase))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 3, 7) });
                 }
 
                 await conn.OpenAsync();
@@ -398,6 +420,7 @@ public class DbService
                         "GetFct_EmployeeNumberTotal" => new DateTime(2024, 12, 3),
                         "Dyn_GetFct_EmployeeNumberTotal" => new DateTime(2024, 12, 3),
                         "GetRecords_summaryTotal" => new DateTime(2024, 12, 26),
+                        "Dyn_GetRecords_summaryTotal" => new DateTime(2024, 12, 26),
                         "GetFct_MMMRankTotal" => new DateTime(2025, 2, 11),
                         "Dyn_GetFct_MMMRankTotal" => new DateTime(2025, 3, 7),
                         "GetFct_StoreNumberTotal" => new DateTime(2025, 3, 7),
