@@ -21,27 +21,6 @@ public class DynamicDataController : Controller
 
         try
         {
-            //model.FieldNames = await _dbService.GetFieldNamesAsync(reportId);
-            // model.GetDynamicReport = await _dbService.GetDynamicReportAsync(reportId);
-            //if (model.GetDynamicReport?.Count > 0)
-            //{
-            //    var firstRow = model.GetDynamicReport[0]?.FirstOrDefault();
-            //    var secondRow = model.GetDynamicReport[1]?.FirstOrDefault();
-            //    model.ReportName = firstRow["RepName"]?.ToString();
-            //    var storedProcName = firstRow["DataProc"]?.ToString();
-            //    model.TableData = await _dbService.DataAsync(storedProcName);
-            //    var totalCountProc = firstRow["GrandTotalProc"]?.ToString();
-            //    model.TotalSum = await _dbService.TotalAsync(totalCountProc);
-            //    model.FieldNames = model.GetDynamicReport[1]
-            //                        .Select(row => row["AttributeName"].ToString().Trim('[', ']')).ToList();
-            //    model.isFixedCol = model.GetDynamicReport[1]
-            //                        .Where(row => row["isFixed"].ToString().Trim() == "True").Select(row => row["isFixed"].ToString()).ToList();
-            //    model.isFilterCol = model.GetDynamicReport[1]
-            //                        .Where(row => row["isFilter"].ToString().Trim() == "True").Select(row => row["isFilter"].ToString()).ToList();
-            //    model.isSubTotalCol = model.GetDynamicReport[1]
-            //                        .Where(row => row["isSubTotal"].ToString().Trim() == "True").Select(row => row["isSubTotal"].ToString()).ToList();
-            //}
-
             var result = _dbService.GetDynamicReportNew(reportId);
             var firstTable = result.resultSet1[0]; // data col header and color
             var secondTable = result.resultSet2[0]; // AttributeName, alisa name for col
@@ -71,6 +50,7 @@ public class DynamicDataController : Controller
                         parameters[column.ColumnName] = firstRow[column.ColumnName];
                     }
                     model.TableData = await _dbService.DataAsync(storedProcName);
+                    model.TableDataCount = (await _dbService.DataAsync(storedProcName)).Count;
                 }
 
                 if (firstRow.Table.Columns.Contains("GrandTotalProc"))
@@ -190,6 +170,9 @@ public class DynamicDataController : Controller
 
                     model.ColorValue3 = row["ColorCode3"] != DBNull.Value ? Convert.ToSingle(row["ColorCode3"]) : 0f;  // Assigning default value of 0 if DBNull
                     model.ColorCode3 = row["ColorValue3"] != DBNull.Value ? row["ColorValue3"].ToString() : null;
+
+                    model.FixedCard = row["FixedCard"] != DBNull.Value ? Convert.ToBoolean(row["FixedCard"]) : false;
+
                 }
             }
 

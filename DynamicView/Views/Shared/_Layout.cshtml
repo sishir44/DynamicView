@@ -7,6 +7,10 @@
     var ColorCodeCnt3 = TempData["ColorCodeCnt3"];
 } *@
 
+@{
+    float count1 = 0, count2 = 0, count3 = 0; // Initialize counts
+}
+
 
 
 <!DOCTYPE html>
@@ -115,23 +119,54 @@
         </div> *@
 
         <div class="row filterClass mt-1">
+            @foreach (var col in Model.ColorAliasName) // Loop through required columns
+            {
+                @* var count1 = 0;
+                var count2 = 0;
+                var count3 = 0; *@
+                 <!-- Display column name -->
+                @foreach (var row in Model.TableData) // Loop through each row to get column values
+                {
+                    if (row.ContainsKey(col)) // Check if column exists in the row
+                    {
+                        var data = row[col]; // Get column data
+
+                        if (row[col] != null && float.TryParse(row[col].ToString(), out float dataValue))
+                        {
+                            if (dataValue < Model.ColorValue1)
+                            {
+                                count1 += 1;
+                            }
+                            else if (dataValue >= Model.ColorValue1 && dataValue < Model.ColorValue2)
+                            {
+                                count2 += 1;
+                            }
+                            else if (dataValue >= Model.ColorValue2)
+                            {
+                                count3 += 1;
+                            }
+                        }
+                        
+                    }
+                }
+            }
 
             <div class="col-lg-1 col-md-2 col-sm-12 col-xs-12 RptCol">
                 <div class="maindiv">
-                    <label>Total Stores</label>
-                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="0">
+                    <label>Total</label>
+                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="@Model.TableDataCount">
 
-                    <label>100% &amp; Above</label>
-                    <input type="button" name=">100" id="tbeCountDisplay" class="form-control" title="100% &amp; Above" value="0" style="background-color: @Model.ColorCode3;">
+                    <label>@Model.ColorValue3 &amp; Above</label>
+                    <input type="button" name=">100" id="tbeCountDisplay" class="form-control" value="@count3" style="background-color: @Model.ColorCode3;">
                 </div>
             </div>
             <div class="col-lg-1 col-md-2 col-sm-12 col-xs-12 RptCol">
                 <div class="maindiv">
-                    <label>70 & Above</label>
-                    <input type="button" name="GAGoals" id="storeCountDisplay1" class="form-control" value="0" style="background-color: @Model.ColorCode2;">
+                    <label>Less Than @Model.ColorValue2</label>
+                    <input type="button" name="GAGoals" id="storeCountDisplay1" class="form-control" value="@count2" style="background-color: @Model.ColorCode2;">
 
-                    <label>Less Than 70</label>
-                    <input type="button" name=">100" id="tbeCountDisplay1" class="form-control" value="0" style="background-color: @Model.ColorCode1;">
+                    <label>Less Than @Model.ColorValue1</label>
+                    <input type="button" name=">100" id="tbeCountDisplay1" class="form-control" value="@count1" style="background-color: @Model.ColorCode1;">
                 </div>
             </div>
 

@@ -239,7 +239,7 @@
                                             {
                                                 if (isPercentColumn)
                                                 {
-                                                    @((Convert.ToDecimal(row[field.column]) * 100).ToString("F" + decimalPlaces) + " %")
+                                                    @((Convert.ToDecimal(row[field.column])).ToString("F" + decimalPlaces) + " %")
                                                 }
                                                 else
                                                 {
@@ -255,7 +255,7 @@
                                         {
                                             if (isPercentColumn)
                                             {
-                                                @((Convert.ToDecimal(row[field.column]) * 100).ToString("F" + 1) + " %")
+                                                @((Convert.ToDecimal(row[field.column])).ToString("F" + 1) + " %")
                                             }
                                             else
                                             {
@@ -307,7 +307,7 @@
                                             {
                                                 if (isPercentColumn)
                                                 {
-                                                    @((Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces) + " %")
+                                                    @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces) + " %")
                                                 }
                                                 else
                                                 {
@@ -323,7 +323,7 @@
                                         {
                                             if (isPercentColumn)
                                             {
-                                                @((Convert.ToDecimal(value) * 100).ToString("F" + 1) + " %")
+                                                @((Convert.ToDecimal(value)).ToString("F" + 1) + " %")
                                             }
                                             else
                                             {
@@ -370,7 +370,7 @@
                                                     {
                                                         if (isPercentColumn)
                                                         {
-                                                            @((Convert.ToDecimal(value) * 100).ToString("F" + decimalPlaces) + " %")
+                                                            @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces) + " %")
                                                         }
                                                         else
                                                         {
@@ -386,7 +386,7 @@
                                                 {
                                                     if (isPercentColumn)
                                                     {
-                                                        @((Convert.ToDecimal(value) * 100).ToString("F" + 1) + " %")
+                                                        @((Convert.ToDecimal(value)).ToString("F" + 1) + " %")
                                                     }
                                                     else
                                                     {
@@ -442,7 +442,7 @@
                                                     {
                                                         if (isPercentColumn)
                                                         {
-                                                            formattedDecimalValue = decimalVal * 100;
+                                                            formattedDecimalValue = decimalVal;
                                                             formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces) + " %";
                                                         }
                                                         else
@@ -462,7 +462,7 @@
                                                             backgroundColor = Model.ColorCode2;
                                                            // ColorCodeCnt2 += 1;
                                                         }
-                                                        else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && formattedDecimalValue < (decimal)Model.ColorValue3)
+                                                        else if (formattedDecimalValue >= (decimal)Model.ColorValue2)
                                                         {
                                                             backgroundColor = Model.ColorCode3;
                                                             //ColorCodeCnt3 += 1;
@@ -491,7 +491,7 @@
                                                     {
                                                         if (isPercentColumn)
                                                         {
-                                                            formattedDecimalValue = decimalVal * 100;
+                                                            formattedDecimalValue = decimalVal;
                                                             formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces) + " %";
                                                         }
                                                         else
@@ -509,7 +509,7 @@
                                                 {
                                                     if (isPercentColumn)
                                                     {
-                                                        formattedDecimalValue = (decimal)value * 100;
+                                                        formattedDecimalValue = (decimal)value;
                                                         formattedValue = formattedDecimalValue.ToString() + " %";
                                                     }
                                                     else
@@ -528,7 +528,7 @@
                                                         backgroundColor = Model.ColorCode2;
                                                         //ColorCodeCnt2 += 1;
                                                     }
-                                                    else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && formattedDecimalValue < (decimal)Model.ColorValue3)
+                                                    else if (formattedDecimalValue >= (decimal)Model.ColorValue2)
                                                     {
                                                         backgroundColor = Model.ColorCode3;
                                                         //ColorCodeCnt3 += 1;
@@ -538,7 +538,7 @@
                                                 {
                                                     if (isPercentColumn)
                                                     {
-                                                        formattedValue = (Convert.ToDecimal(value) * 100).ToString("F1") + " %";
+                                                        formattedValue = (Convert.ToDecimal(value)).ToString("F1") + " %";
                                                     }
                                                     else
                                                     {
@@ -651,7 +651,7 @@
                                         {
                                             if (isPercentColumn)
                                             {
-                                                formattedDecimalValue = decimalVal * 100;
+                                                formattedDecimalValue = decimalVal;
                                                 formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces) + " %";
                                             }
                                             else
@@ -671,7 +671,7 @@
                                                 backgroundColor = Model.ColorCode2;
                                                 // ColorCodeCnt2 += 1;
                                             }
-                                            else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && formattedDecimalValue < (decimal)Model.ColorValue3)
+                                            else if (formattedDecimalValue >= (decimal)Model.ColorValue2)
                                             {
                                                 backgroundColor = Model.ColorCode3;
                                                 //ColorCodeCnt3 += 1;
@@ -700,7 +700,7 @@
                                         {
                                             if (isPercentColumn)
                                             {
-                                                formattedDecimalValue = decimalVal * 100;
+                                                formattedDecimalValue = decimalVal;
                                                 formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces) + " %";
                                             }
                                             else
@@ -718,7 +718,7 @@
                                     {
                                         if (isPercentColumn)
                                         {
-                                            formattedDecimalValue = (decimal)value * 100;
+                                            formattedDecimalValue = (decimal)value;
                                             formattedValue = formattedDecimalValue.ToString() + " %";
                                         }
                                         else
@@ -737,7 +737,7 @@
                                             backgroundColor = Model.ColorCode2;
                                             //ColorCodeCnt2 += 1;
                                         }
-                                        else if (formattedDecimalValue >= (decimal)Model.ColorValue2 && formattedDecimalValue < (decimal)Model.ColorValue3)
+                                        else if (formattedDecimalValue >= (decimal)Model.ColorValue2)
                                         {
                                             backgroundColor = Model.ColorCode3;
                                             //ColorCodeCnt3 += 1;
@@ -747,7 +747,7 @@
                                     {
                                         if (isPercentColumn)
                                         {
-                                            formattedValue = (Convert.ToDecimal(value) * 100).ToString("F1") + " %";
+                                            formattedValue = (Convert.ToDecimal(value)).ToString("F1") + " %";
                                         }
                                         else
                                         {
@@ -758,11 +758,11 @@
                                     {
                                         if (isPercentColumn)
                                         {
-                                            //formattedValue = (Convert.ToDecimal(value) * 100).ToString("F1") + " %";
+                                            //formattedValue = (Convert.ToDecimal(value)).ToString("F1") + " %";
                                             if (value != DBNull.Value)
                                             {
                                                 decimal decimalVal = Convert.ToDecimal(value);
-                                                formattedValue = (decimalVal * 100).ToString("F1") + " %";
+                                                formattedValue = (decimalVal).ToString("F1") + " %";
                                             }
                                             else
                                             {

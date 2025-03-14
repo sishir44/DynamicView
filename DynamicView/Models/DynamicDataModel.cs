@@ -8,6 +8,7 @@ namespace DynamicView.Models
         public List<string> isFixedCol { get; set; }
         public List<string> isFixedM { get; set; }
         public List<string> isFilterCol { get; set; }
+        public bool FixedCard { get; set; }
         public List<string> isSubTotalCol { get; set; }
         public Dictionary<string, short?> NoOfDecimal { get; set; }
         public Dictionary<string, bool?> ShowCard { get; set; }
@@ -29,7 +30,7 @@ namespace DynamicView.Models
         public int ColorCodeCnt2 { get; set; }
         public int ColorCodeCnt3 { get; set; }
 
-
+        public int TableDataCount { get; set; }
 
         // public List<string> TtlCount { get; set; }
         public string FilterColumn { get; set; }
