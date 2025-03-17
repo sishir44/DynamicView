@@ -1,12 +1,5 @@
 ﻿@model DynamicView.Models.DynamicDataModel
 
-@* @{
-    var TotalCount = TempData["TotalCount"];
-    var ColorCodeCnt1 = TempData["ColorCodeCnt1"];
-    var ColorCodeCnt2 = TempData["ColorCodeCnt2"];
-    var ColorCodeCnt3 = TempData["ColorCodeCnt3"];
-} *@
-
 @{
     float count1 = 0, count2 = 0, count3 = 0; // Initialize counts
 }
@@ -26,12 +19,13 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
-    <script>
-        
-        </script>
+  
 
 </head>
 <body>
+
+    @await Html.PartialAsync("_HeaderSection")  <!-- Render Partial View -->
+
     @* <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white3">
     <div class="container-fluid">
@@ -64,7 +58,7 @@
     </div>
     </nav>
     </header> *@
-    <header>
+    @* <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm" style="color: black; background-color:@Model.Color;">
             <div class="container-fluid">
                 <h2 id="reportHeader">@Model.ReportName</h2>
@@ -118,20 +112,21 @@
             </div>
         </div> *@
 
-        <div class="row filterClass mt-1">
+        @* <div class="row filterClass mt-1">
+            @if (Model.ColorAliasName != null) {
             @foreach (var col in Model.ColorAliasName) // Loop through required columns
             {
                 @* var count1 = 0;
                 var count2 = 0;
-                var count3 = 0; *@
+                var count3 = 0; 
                  <!-- Display column name -->
-                @foreach (var row in Model.TableData) // Loop through each row to get column values
-                {
+               //@foreach (var row in Model.TableData) // Loop through each row to get column values
+                //{
                     if (row.ContainsKey(col)) // Check if column exists in the row
                     {
                         var data = row[col]; // Get column data
 
-                        if (row[col] != null && float.TryParse(row[col].ToString(), out float dataValue))
+                        //if (row[col] != null && float.TryParse(row[col].ToString(), out float dataValue))
                         {
                             if (dataValue < Model.ColorValue1)
                             {
@@ -149,14 +144,14 @@
                         
                     }
                 }
-            }
+            } 
 
             <div class="col-lg-1 col-md-2 col-sm-12 col-xs-12 RptCol">
                 <div class="maindiv">
                     <label>Total</label>
-                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="@Model.TableDataCount">
+                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="@Model.TableData.Count">
 
-                    <label>@Model.ColorValue3 &amp; Above</label>
+                    <label>@Model.ColorValue2 &amp; Above</label>
                     <input type="button" name=">100" id="tbeCountDisplay" class="form-control" value="@count3" style="background-color: @Model.ColorCode3;">
                 </div>
             </div>
@@ -169,8 +164,10 @@
                     <input type="button" name=">100" id="tbeCountDisplay1" class="form-control" value="@count1" style="background-color: @Model.ColorCode1;">
                 </div>
             </div>
+            }
 
 
+            @if(Model.isFilterCol != null) {
             @foreach (var column in Model.isFilterCol as List<string>)
             {
                 var columnId = column.Replace(" ", ""); // Remove spaces to create valid IDs
@@ -195,10 +192,11 @@
                     </select>
                 </div>
             }
+            }
         </div>
 
 
-        @* Mobile Dropdown *@
+        @* Mobile Dropdown 
         <div class="container dropdownSearchBar">
             <div class="filter-section row g-3 mt-0 filterSearchBar">
                 <div class="col-md-6">
@@ -215,7 +213,7 @@
                 </div>
             </div>
         </div>
-    </header>
+    </header> *@
 
 
 

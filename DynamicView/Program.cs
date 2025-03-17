@@ -1,3 +1,4 @@
+using DynamicView.Controllers;
 using Microsoft.AspNetCore.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -25,6 +26,12 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=DynamicData}/{action=Index}");
+
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=DynamicReportList}/{action=Index}");
+
+
 
 //app.MapControllerRoute(
 //    name: "dynamicData",

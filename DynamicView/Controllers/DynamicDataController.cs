@@ -12,7 +12,7 @@ public class DynamicDataController : Controller
         _dbService = dbService;
     }
 
-    public async Task<IActionResult> Index(int reportId = 3)
+    public async Task<IActionResult> Index(int reportId = 1,string userId = null, string selectedDate = null, string columnId = null, string selectedValue = null)
     {
         DynamicDataModel model = new DynamicDataModel();
 
@@ -45,26 +45,55 @@ public class DynamicDataController : Controller
                 {
                     var storedProcName = firstRow["DataProc"]?.ToString();
                     var parameters = new Dictionary<string, object>();
-                    foreach (DataColumn column in firstRow.Table.Columns)
+
+                    // Add selectedDate if it's provided
+                    //if (!string.IsNullOrEmpty(selectedDate))
+                    //{
+                    //    parameters.Add("@Date", selectedDate);
+                    //}
+                    //else
+                    //{
+                    //    parameters.Add("@Date", DBNull.Value);
+                    //}
+                    parameters.Add("@UserID", string.IsNullOrEmpty(userId) ? DBNull.Value : userId);
+                    parameters.Add("@Date", string.IsNullOrEmpty(selectedDate) ? DBNull.Value : selectedDate);
+
+                    // Dynamically add parameters based on columnId and selectedValue
+                    if (!string.IsNullOrEmpty(columnId) && !string.IsNullOrEmpty(selectedValue))
                     {
-                        parameters[column.ColumnName] = firstRow[column.ColumnName];
+                        parameters.Add($"@{columnId}", selectedValue);
                     }
-                    model.TableData = await _dbService.DataAsync(storedProcName);
-                    model.TableDataCount = (await _dbService.DataAsync(storedProcName)).Count;
+
+                    //foreach (DataColumn column in firstRow.Table.Columns)
+                    //{
+                    //    parameters[column.ColumnName] = firstRow[column.ColumnName];
+                    //}
+
+                    model.TableData = await _dbService.DataAsync(storedProcName, parameters);
+                    //model.TableDataCount = (await _dbService.DataAsync(storedProcName, parameters)).Count;
                 }
 
                 if (firstRow.Table.Columns.Contains("GrandTotalProc"))
                 {
                     var totalCountProc = firstRow["GrandTotalProc"]?.ToString();
                     
-                    if (totalCountProc != "N/A" || totalCountProc == "")
+                    if (totalCountProc != "N/A" && totalCountProc != "")
                     {
                         var parameters = new Dictionary<string, object>();
+                        parameters.Add("@UserID", string.IsNullOrEmpty(userId) ? DBNull.Value : userId);
+                        parameters.Add("@Date", string.IsNullOrEmpty(selectedDate) ? DBNull.Value : selectedDate);
 
-                        foreach (DataColumn column in firstRow.Table.Columns)
+                        // Dynamically add parameters based on columnId and selectedValue
+                        if (!string.IsNullOrEmpty(columnId) && !string.IsNullOrEmpty(selectedValue))
                         {
-                            parameters[column.ColumnName] = firstRow[column.ColumnName];
+                            parameters.Add($"@{columnId}", selectedValue);
                         }
+
+                        //foreach (DataColumn column in firstRow.Table.Columns)
+                        //{
+                        //    parameters[column.ColumnName] = firstRow[column.ColumnName];
+                        //}
+
                         model.TotalSum = await _dbService.TotalAsync(totalCountProc, parameters);
                     }
 

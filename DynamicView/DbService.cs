@@ -194,7 +194,7 @@ public class DbService
         }
         return resultList;
     }
-    public async Task<List<Dictionary<string, object>>> DataAsync(string storedProcName)
+    public async Task<List<Dictionary<string, object>>> DataAsync(string storedProcName, Dictionary<string, object> parameters)
     {
         var resultList = new List<Dictionary<string, object>>();
         using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -203,45 +203,30 @@ public class DbService
             {
                 cmd.CommandType = CommandType.StoredProcedure;
 
+                foreach (var param in parameters)
+                {
+                    // Ensure NULL values are handled correctly
+                    cmd.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
+                }
+
+                //DateTime defaultDate = storedProcName switch
+                //{
+                //    "GetFct_My_MTDStoreRankupdated" => new DateTime(2025, 2, 24),
+                //    "GetFct_My_MTDTMRank" => new DateTime(2025, 2, 24),
+                //    "GetFct_My_MTDMMMRank" => new DateTime(2025, 3, 7),
+                //    "GetFct_Summary" => new DateTime(2025, 2, 2),
+                //    "Dyn_GetFct_Summary" => new DateTime(2025, 2, 2),
+                //    _ => DateTime.MinValue  // Default if no match
+                //};
+                //if (defaultDate != DateTime.MinValue)
+                //{
+                //    cmd.Parameters.AddWithValue("@DateParam", defaultDate);
+                //}
                 //if (storedProcName.Equals("GETMTDEmployee", StringComparison.OrdinalIgnoreCase))
                 //{
                 //    cmd.Parameters.Add(new SqlParameter("@userID", SqlDbType.Int) { Value = 1 });
                 //    cmd.Parameters.Add(new SqlParameter("@date", SqlDbType.Date) { Value = DBNull.Value });
                 //}
-                //if (storedProcName.Equals("GetFct_My_MTDStoreRankupdated", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 24) });
-                //}
-                //if (storedProcName.Equals("GetFct_My_MTDTMRank", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 24) });
-                //}
-                //if (storedProcName.Equals("GetFct_My_MTDMMMRank", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 3, 7) });
-                //}
-                //if (storedProcName.Equals("GetFct_Summary", StringComparison.OrdinalIgnoreCase))
-                //{
-                //    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 2) });
-                //}
-                DateTime defaultDate = storedProcName switch
-                {
-                    "GetFct_My_MTDStoreRankupdated" => new DateTime(2025, 2, 24),
-                    "GetFct_My_MTDTMRank" => new DateTime(2025, 2, 24),
-                    "GetFct_My_MTDMMMRank" => new DateTime(2025, 3, 7),
-                    "GetFct_Summary" => new DateTime(2025, 2, 2),
-                    "Dyn_GetFct_Summary" => new DateTime(2025, 2, 2),
-                    _ => DateTime.MinValue  // Default if no match
-                };
-                if (defaultDate != DateTime.MinValue)
-                {
-                    cmd.Parameters.AddWithValue("@DateParam", defaultDate);
-                }
-                if (storedProcName.Equals("GETMTDEmployee", StringComparison.OrdinalIgnoreCase))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@userID", SqlDbType.Int) { Value = 1 });
-                    cmd.Parameters.Add(new SqlParameter("@date", SqlDbType.Date) { Value = DBNull.Value });
-                }
 
                 await conn.OpenAsync();
                 using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
@@ -355,95 +340,48 @@ public class DbService
     //    }
     //    return resultList;
     //}
-    public async Task<List<Dictionary<string, object>>> TotalAsync(string storedProcName, Dictionary<string, object> availableValues)
+    public async Task<List<Dictionary<string, object>>> TotalAsync(string storedProcName, Dictionary<string, object> parameters)
     {
         var resultList = new List<Dictionary<string, object>>();
         try
         {
             using (SqlConnection conn = new SqlConnection(_connectionString))
             {
-                await conn.OpenAsync();
-                var requiredParameters = await GetStoredProcedureParameters(conn, storedProcName);
                 using (SqlCommand cmd = new SqlCommand(storedProcName, conn))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
-                        //foreach (var param in requiredParameters)
-                        //{
 
-
-                        //    if (availableValues.ContainsKey(param))
-                        //    {
-                        //        cmd.Parameters.AddWithValue(param, availableValues[param] ?? DBNull.Value);
-                        //    }
-                        //else
-                        //{
-                        //    var defaultDate = new DateTime();
-                        //    if (storedProcName == "GetFct_EmployeeNumberTotal")
-                        //    {
-                        //        defaultDate = new DateTime(2024, 12, 3);
-                        //        cmd.Parameters.AddWithValue(param, defaultDate);
-                        //    }
-                        //    else if (storedProcName == "GetRecords_summaryTotal")
-                        //    {
-                        //        defaultDate = new DateTime(2024, 12, 26);
-                        //        cmd.Parameters.AddWithValue(param, defaultDate);
-                        //    }
-                        //    else if (storedProcName == "GetFct_MMMRankTotal")
-                        //    {
-                        //        defaultDate = new DateTime(2025, 2, 11);
-                        //        cmd.Parameters.AddWithValue(param, defaultDate);
-                        //    }
-                        //    else if (storedProcName == "GetFct_StoreNumberTotal")
-                        //    {
-                        //        cmd.Parameters.AddWithValue("@DateParam", new DateTime(2025, 2, 11));
-                        //        // Set other parameters as NULL
-                        //        cmd.Parameters.AddWithValue("@Sd", DBNull.Value);
-                        //        cmd.Parameters.AddWithValue("@Tm", DBNull.Value);
-                        //        cmd.Parameters.AddWithValue("@Market", DBNull.Value);
-                        //        cmd.Parameters.AddWithValue("@MMM", DBNull.Value);
-                        //        cmd.Parameters.AddWithValue("@Store", DBNull.Value);
-                        //        cmd.Parameters.AddWithValue("@Tiers", DBNull.Value);
-                        //        cmd.Parameters.AddWithValue("@UserID", DBNull.Value);
-                        //    }
-                        //    else
-                        //    {
-                        //        cmd.Parameters.AddWithValue(param, DBNull.Value);
-                        //    }
-                        //    //cmd.Parameters.AddWithValue(param, storedProcName == "GetFct_StoreNumberTotal" ? new DateTime(2025, 1, 26) : DBNull.Value);
-                        //    //cmd.Parameters.AddWithValue(param, storedProcName == "GetFct_EmployeeNumberTotal" ? new DateTime(2024, 12, 3) : DBNull.Value);
-                        //    //cmd.Parameters.AddWithValue(param, storedProcName == "GetRecords_summaryTotal" ? new DateTime(2024, 12, 26) : DBNull.Value);
-                        //    //cmd.Parameters.AddWithValue(param, storedProcName == "GetFct_MMMRankTotal" ? new DateTime(2025, 2, 11) : DBNull.Value);
-                        //}
-                    //}
-                    DateTime defaultDate = storedProcName switch
+                    foreach (var param in parameters)
                     {
-                        "GetFct_EmployeeNumberTotal" => new DateTime(2024, 12, 3),
-                        "Dyn_GetFct_EmployeeNumberTotal" => new DateTime(2024, 12, 3),
-                        "GetRecords_summaryTotal" => new DateTime(2024, 12, 26),
-                        "Dyn_GetRecords_summaryTotal" => new DateTime(2024, 12, 26),
-                        "GetFct_MMMRankTotal" => new DateTime(2025, 2, 11),
-                        "Dyn_GetFct_MMMRankTotal" => new DateTime(2025, 3, 7),
-                        "GetFct_StoreNumberTotal" => new DateTime(2025, 3, 7),
-                        "Dyn_GetFct_StoreNumberTotal" => new DateTime(2025, 2, 11),
-                        _ => DateTime.MinValue  // Default if no match
-                    };
-
-                    cmd.Parameters.AddWithValue("@DateParam", defaultDate);
-                    foreach (var param in requiredParameters)
-                    {
-                        // Avoid adding @DateParam again if it already exists
-                        if (param != "@DateParam")
-                        {
-                            cmd.Parameters.AddWithValue(param, DBNull.Value);
-                        }
+                        // Ensure NULL values are handled correctly
+                        cmd.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
                     }
-                    
+
+                    //DateTime defaultDate = storedProcName switch
+                    //{
+                    //    "GetFct_My_MTDStoreRankupdated" => new DateTime(2025, 2, 24),
+                    //    "GetFct_My_MTDTMRank" => new DateTime(2025, 2, 24),
+                    //    "GetFct_My_MTDMMMRank" => new DateTime(2025, 3, 7),
+                    //    "GetFct_Summary" => new DateTime(2025, 2, 2),
+                    //    "Dyn_GetFct_Summary" => new DateTime(2025, 2, 2),
+                    //    _ => DateTime.MinValue  // Default if no match
+                    //};
+                    //if (defaultDate != DateTime.MinValue)
+                    //{
+                    //    cmd.Parameters.AddWithValue("@DateParam", defaultDate);
+                    //}
+                    //if (storedProcName.Equals("GETMTDEmployee", StringComparison.OrdinalIgnoreCase))
+                    //{
+                    //    cmd.Parameters.Add(new SqlParameter("@userID", SqlDbType.Int) { Value = 1 });
+                    //    cmd.Parameters.Add(new SqlParameter("@date", SqlDbType.Date) { Value = DBNull.Value });
+                    //}
+
+                    await conn.OpenAsync();
                     using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
                     {
                         while (await reader.ReadAsync())
                         {
                             var row = new Dictionary<string, object>();
-
                             for (int i = 0; i < reader.FieldCount; i++)
                             {
                                 row[reader.GetName(i)] = reader[i];
