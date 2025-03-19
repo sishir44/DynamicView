@@ -1,6 +1,6 @@
 ﻿namespace DynamicView.Models
 {
-    public class DynamicReportListModel
+    public class DynamicListModel
     {
         public int ReportID { get; set; }
         public string ReportName { get; set; }

@@ -62,17 +62,17 @@
 
     <script>
         $(document).ready(function () {
-            // $(".selectorinput").on("keyup", function () {
-            //     let columnId = $(this).attr("data-column");
-            //     let input = $(this).val().toLowerCase();
+            $(".selectorinput").on("keyup", function () {
+                let columnId = $(this).attr("data-column");
+                let input = $(this).val().toLowerCase();
 
-            //     let $dropdown = $("#dropdown_" + columnId);
-            //     if ($dropdown.length) {
-            //         $dropdown.find("option").each(function () {
-            //             $(this).toggle($(this).text().toLowerCase().includes(input));
-            //         });
-            //     }
-            // });
+                let $dropdown = $("#dropdown_" + columnId);
+                if ($dropdown.length) {
+                    $dropdown.find("option").each(function () {
+                        $(this).toggle($(this).text().toLowerCase().includes(input));
+                    });
+                }
+            });
             // $("#dataTable tbody tr").each(function () {
             //     let $row = $(this);
             //     let $td = $row.find(`[data-column='${columnId}']`);
@@ -193,44 +193,138 @@
                     }
                 });
 
-                $("#selectedDate").change(function () {
-                    var selectedDate = $(this).val();
-                    var columnId = $(this).data('column'); // You can set the columnId if needed, for example, from a data attribute
-                    var selectedValue = $("#dropdown_" + columnId).val(); // Get the selected option value from the dropdown
+            $("#selectedDate").change(function () {
+                var selectedDate = $(this).val();
+                var columnId = $(this).data('column');
+                var selectedValue = $("#dropdown_" + columnId).val();
 
-                    if (selectedDate || selectedValue) {
-                        // Perform AJAX request to fetch updated data without reloading the page
-                        fetchData(selectedDate, columnId, selectedValue);
-                    }
-                });
-
-                // When the dropdown selection changes
-                $(".filter-dropdown").change(function () {
-                    var columnId = $(this).data('column');
-                    var selectedDate = $("#selectedDate").val(); // Get the selected date from the date input
-                    var selectedValue = $(this).val(); // Get the selected value from the dropdown
-
-                    if (selectedDate || selectedValue) {
-                        // Perform AJAX request to fetch updated data based on the columnId and selected value
-                        fetchData(selectedDate, columnId, selectedValue);
-                    }
-                });
-            });
-        
-        // Fetch data based on the selectedDate, columnId, and selectedValue
-        function fetchData(dateParam, columnId, selectedValue) {
-            $.ajax({
-                url: '/DynamicData/Index',
-                type: 'GET',
-                data: { selectedDate: dateParam, columnId: columnId, selectedValue: selectedValue },
-                success: function (data) {
-                    // Update the table content dynamically
-                    $("#dataTable").html(data); // Update the table content in the page
-                },
-                error: function (error) {
-                    console.error("Error fetching data", error);
+                if (selectedDate || selectedValue) {
+                    fetchData(selectedDate, columnId, selectedValue);
+                    setTableMargin();
                 }
             });
+
+            // When the dropdown selection changes
+            $(".filter-dropdown").change(function () {
+                var columnId = $(this).data('column');
+                var selectedDate = $("#selectedDate").val();
+                var selectedValue = $(this).val();
+
+                if (selectedDate || selectedValue) {
+                    fetchData(selectedDate, columnId, selectedValue);
+                    setTableMargin();
+                }
+            });
+
+            nonFixColor();
+            fixedCol();
+
+        });
+
+            // Fetch data based on the selectedDate, columnId, and selectedValue
+            function fetchData(dateParam, columnId, selectedValue) {
+
+                // Extract reportId from the URL path
+                var pathSegments = window.location.pathname.split('/'); // Split URL by "/"
+                var reportId = pathSegments[pathSegments.length - 1]; // Get the last segment
+
+                $.ajax({
+                    url: '/DynamicData/Index',
+                    type: 'GET',
+                    data: {
+                        reportId: reportId,
+                        selectedDate: dateParam,
+                        columnId: columnId,
+                        selectedValue: selectedValue
+                    },
+                    success: function (data) {
+                        // Update the table content dynamically
+                        $("#dataTable").html(data); // Update the table content in the page
+                    },
+                    error: function (error) {
+                        console.error("Error fetching data", error);
+                    }
+                });
+            }
+
+            function setTableStyles() {
+                $("table").css({
+                    "margin-top": "50px",
+                    "width": "100%" // Ensures the table width remains full
+                });
+            }
+
+            function nonFixColor() {
+                var colorCode = '@Model.Color';
+                var elements = document.getElementsByClassName('non-fixed-column');
+
+                for (var i = 0; i < elements.length; i++) {
+                    elements[i].style.setProperty('background-color', colorCode, 'important');
+                }
+            }
+
+
+
+        function fixedCol() {
+            /* Reload the page when View Change Begin */
+            let lastViewportWidth = sessionStorage.getItem('lastViewportWidth');
+            let currentWidth = window.innerWidth;
+
+            function checkAndReload() {
+                let newWidth = window.innerWidth;
+                if (lastViewportWidth !== newWidth) {
+                    sessionStorage.setItem('lastViewportWidth', newWidth);
+                    location.reload();
+                }
+            }
+            if (!lastViewportWidth) {
+                sessionStorage.setItem('lastViewportWidth', currentWidth);
+            }
+            window.addEventListener('resize', function () {
+                checkAndReload();
+            });
+            /* Reload the page when View Change End */
+
+            /* Dynamic fixed column handle Begin */
+            // Get fixed columns from Razor model
+            var fixedColumns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.isFixedCol));
+            if (fixedColumns.length > 0) {
+                let leftPosition = 0;
+                let zIndex = 10;
+
+                // Find column indexes dynamically
+                let headers = document.querySelectorAll("thead tr:nth-child(2) th");
+                let columnIndexMap = {};
+
+                headers.forEach((th, index) => {
+                    let columnName = th.textContent.trim();
+                    if (fixedColumns.includes(columnName)) {
+                        columnIndexMap[columnName] = index + 1;
+                    }
+                });
+
+                // Apply sticky styles to fixed columns
+                Object.keys(columnIndexMap).forEach((colName) => {
+                    let index = columnIndexMap[colName];
+
+                    // Calculate the actual width of the column
+                    let firstCell = document.querySelector(`th:nth-child(${index})`);
+                    let columnWidth = firstCell ? firstCell.offsetWidth : 100;
+
+                    document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
+                        cell.classList.add("fixed-column");
+                        cell.style.left = `${leftPosition}px`;
+                        cell.style.zIndex = zIndex;
+                        cell.style.minWidth = `${columnWidth}px`;
+                        cell.style.maxWidth = `${columnWidth}px`;
+                    });
+
+                    // Increment leftPosition based on actual column width
+                    leftPosition += columnWidth;
+                    zIndex++;
+                });
+            }
+            /* Dynamic fixed column handle End */
         }
     </script>
 
@@ -246,6 +340,7 @@
     </script>
 
 </head>
+@await Html.PartialAsync("_HeaderSection")
 <body class="body-scrollbar">
 
     <!-- Data Table -->
@@ -637,7 +732,8 @@
                 }
                 else
                 {
-                    @if (Model.TableData != null && Model.TableData.Count > 0) {
+                    @if (Model.TableData != null && Model.TableData.Count > 0)
+                    {
                         @foreach (var row in Model.TableData)
                         {
                             <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">

@@ -56,5 +56,13 @@ namespace DynamicView.Models
         public string ColorCode3 { get; set; }
 
 
+
+
+
+
+        public int ReportID { get; set; }
+        public string ReportNameList { get; set; }
+        public Dictionary<int, string> ReportList { get; set; }
+
     }
 }

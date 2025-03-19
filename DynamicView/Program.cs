@@ -25,11 +25,9 @@ app.UseAuthorization();
 // Routing Default to DynamicViewPage
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=DynamicData}/{action=Index}");
-
-//app.MapControllerRoute(
-//    name: "default",
-//    pattern: "{controller=DynamicReportList}/{action=Index}");
+    //pattern: "{controller=DynamicReportList}/{action=Index}");
+    //pattern: "{controller=DynamicReportList}/{action=Index}/{id?}");
+pattern: "{controller=DynamicReportList}/{action=Index}/{reportId?}/{userId?}/{selectedDate?}/{columnId?}/{selectedValue?}");
 
 
 

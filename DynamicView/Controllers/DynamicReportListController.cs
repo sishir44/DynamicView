@@ -1,21 +1,31 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using DynamicView.Models;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.DotNet.Scaffolding.Shared.Messaging;
 
 namespace DynamicView.Controllers
 {
     public class DynamicReportListController : Controller
     {
-        // Initial action when the application starts
-        public IActionResult PromptPage()
+        private readonly DbService _dbService;
+
+        public DynamicReportListController(DbService dbService)
         {
-            return View();  // Show the prompt page
+            _dbService = dbService;
         }
 
-        // Action to redirect to the main page after user input
-        [HttpPost]
-        public IActionResult RedirectToReport(int reportId)
+        public async Task<IActionResult> Index()
         {
-            // Redirect to the main page after the user enters the Report ID
-            return RedirectToAction("Index", "DynamicData", new { id = reportId });
+            DynamicReportListModel model = new DynamicReportListModel();
+            try
+            {
+                var reportList = await _dbService.GetDynamicReportsAsync();
+                model.ReportList = reportList.ToDictionary(r => r.ReportID, r => r.ReportName); ;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+            return View(model);
         }
     }
 }

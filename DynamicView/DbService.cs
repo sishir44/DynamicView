@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using DynamicView.Models;
+using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 
@@ -424,6 +425,81 @@ public class DbService
             return (resultSet1, resultSet2, resultSet3, resultSet4, resultSet5, resultSet6,resultSet7, resultSet8, resultSet9, resultSet10);
         }
     }
+
+    public async Task<IEnumerable<DynamicListModel>> GetDynamicReportsAsync()
+    {
+        var reports = new List<DynamicListModel>();
+
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            try
+            {
+                await connection.OpenAsync();
+
+                using (var command = new SqlCommand("Dyn_DynamicReportList", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        while (await reader.ReadAsync())
+                        {
+                            var report = new DynamicListModel
+                            {
+                                ReportID = reader.GetInt32(reader.GetOrdinal("ReportID")),
+                                ReportName = reader.GetString(reader.GetOrdinal("RepName"))
+                            };
+
+                            reports.Add(report);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        return reports;
+    }
+
+    public async Task<DynamicListModel> GetReportByIDAsync(int reportID)
+    {
+        var report = new DynamicListModel();
+
+        using (var connection = new SqlConnection(_connectionString))
+        {
+            try
+            {
+                await connection.OpenAsync();
+
+                // Create command to execute the stored procedure
+                using (var command = new SqlCommand("Dyn_DynamicReportList", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@ReportID", reportID);
+
+                    // Execute the command and read the results
+                    using (var reader = await command.ExecuteReaderAsync())
+                    {
+                        if (await reader.ReadAsync())
+                        {
+                            report.ReportID = reader.GetInt32(reader.GetOrdinal("ReportID"));
+                            report.ReportName = reader.GetString(reader.GetOrdinal("RepName"));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Handle exceptions (you can log the error as needed)
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        return report;
+    }
+
 
     //public async Task<DataTable> ExecuteStoredProcedureAsync(string storedProcName, DataRow row)
     //{

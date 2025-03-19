@@ -12,7 +12,7 @@ public class DynamicDataController : Controller
         _dbService = dbService;
     }
 
-    public async Task<IActionResult> Index(int reportId = 1,string userId = null, string selectedDate = null, string columnId = null, string selectedValue = null)
+    public async Task<IActionResult> Index(int reportId,string userId = null, string selectedDate = null, string columnId = null, string selectedValue = null)
     {
         DynamicDataModel model = new DynamicDataModel();
 
@@ -241,6 +241,32 @@ public class DynamicDataController : Controller
         }
         return View(model);
     }
+
+
+    public async Task<IActionResult> DynamicList()
+    {
+        //DynamicListModel model = new DynamicListModel();
+        DynamicDataModel model = new DynamicDataModel();
+        // Fetch data from the DbService
+        var reportList= await _dbService.GetDynamicReportsAsync();
+        model.ReportList = reportList.ToDictionary(r => r.ReportID, r => r.ReportName); ;
+        // Pass the model to the view
+        //ViewBag.Reports = model;
+
+        return View(model);
+    }
+
+    //public async Task<IActionResult> DynamicListByReport(int reportID)
+    //{
+    //    // Fetch data based on the ReportID
+    //    var model = await _dbService.GetReportByIDAsync(reportID);
+
+    //    // Pass the model to the view
+    //    ViewBag.Reports = model;
+
+    //    return View("DynamicList", model); // Return the same view or a different one
+    //}
+
 
     // Helper method to generate column names (Excel-style)
     public List<string> CommonNameHelper(int numberOfColumns)
