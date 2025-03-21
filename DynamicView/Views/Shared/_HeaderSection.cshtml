@@ -2,7 +2,121 @@
 
 @{
     float count1 = 0, count2 = 0, count3 = 0; // Initialize counts
+    var fixedColumns = Model.FieldNames.Where(field => Model.isFixedCol.Contains(field)).ToList();
+    var remainingColumns = Model.FieldNames.Where(field => !Model.isFixedCol.Contains(field)).ToList();
+    var orderedColumns = fixedColumns.Concat(remainingColumns).ToList();
+
+    @if (Model.ColorAliasName != null)
+    {
+        @foreach (var col in Model.ColorAliasName) // Loop through required columns
+        {
+            <!-- Display column name -->
+            @foreach (var row in Model.TableData) // Loop through each row to get column values
+            {
+                if (row.ContainsKey(col)) // Check if column exists in the row
+                {
+                    var data = row[col]; // Get column data
+
+                    if (row[col] != null && float.TryParse(row[col].ToString(), out float dataValue))
+                    {
+                        if (dataValue < Model.ColorValue1)
+                        {
+                            count1 += 1;
+                        }
+                        else if (dataValue >= Model.ColorValue1 && dataValue < Model.ColorValue2)
+                        {
+                            count2 += 1;
+                        }
+                        else if (dataValue >= Model.ColorValue2)
+                        {
+                            count3 += 1;
+                        }
+                    }
+
+                }
+            }
+        }
+    }
 }
+
+<style>
+    .maindivshow {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin: 5px;
+    }
+
+    .collabel {
+        font-size: 9px;
+        font-weight: bold;
+        /* text-align: center; */
+        margin-bottom: 5px;
+        white-space: pre-line; /* Prevents text wrapping */
+        word-break: break-word; /* Ensures long words wrap */
+        overflow-wrap: break-word; /* Alternative way to break long words */
+        max-width: 150px; /* Adjust width as needed */
+        display: block; /* Ensures it works properly */
+    }
+
+    .maindivshow input.showcardinput {
+        font-size: 10px;
+        height: 24px;
+        width: 50px;
+        border-radius: 6px;
+        text-align: center;
+        background-color: beige;
+        border: 1px solid #ccc;
+    }
+
+    .w-100 {
+        flex-basis: 100%;
+        height: 0;
+    }
+
+
+    .filterClass {
+        background-color: white !important;
+        margin-left: 1px;
+        margin-right: -1px;
+        overflow-x: auto;
+    }
+
+    /* New scrollable container */
+    .scrollHeader {
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 10px;
+    }
+
+    /* Prevent columns from wrapping to the next line */
+    .table-row {
+        display: flex;
+        flex-wrap: nowrap;
+    }
+
+    /* Ensure each column has enough space */
+    .RptCol, .text-center, .filterBox {
+        min-width: 100px; /* Adjust width as per requirement */
+    }
+
+    /* Optional: Style scrollbar */
+    .scrollHeader::-webkit-scrollbar {
+        height: 8px;
+    }
+
+    .scrollHeader::-webkit-scrollbar-thumb {
+        background: blue;
+        border-radius: 4px;
+    }
+
+    .scrollHeader::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+</style>
+
 
 
 <header>
@@ -19,129 +133,87 @@
         </div>
     </nav>
 
-    @* <div class="row filterClass">
-    <div class="row mt-1 searchBarFilter">
-    <div class="row">
-    @foreach (var column in Model.isFilterCol as List<string>)
-    {
-    var columnId = column.Replace(" ", ""); // Remove spaces to create valid IDs
-    <div class="col-md-2">
-    <input type="text"
-    name="textSearch@columnId"
-    id="textSearch@columnId"
-    class="selectorinput form-control"
-    placeholder="Search @column..."
-    data-column="@columnId" />
-    </div>
-    }
-    </div>
-    </div>
-
-    <div class="row searchBarFilterData">
-    @foreach (var column in Model.isFilterCol as List<string>)
-    {
-    var columnId = column.Replace(" ", "");
-    var uniqueValues = Model.TableData
-    .Where(data => data.ContainsKey(column))
-    .Select(data => data[column]?.ToString())
-    .Distinct()
-    .ToList();
-
-    <div class="col-md-2">
-    <select class="form-control filter-dropdown mt-2" id="dropdown_@columnId" size="5" data-column="@columnId">
-    @foreach (var value in uniqueValues)
-    {
-    <option class="optionfilter" style="background-color: @Model.Color;" value="@value" title="@value">@value</option>
-    }
-    </select>
-    </div>
-    }
-    </div>
-    </div> *@
 
     <div class="row filterClass mt-1">
-        @if (Model.ColorAliasName != null)
-        {
-            @foreach (var col in Model.ColorAliasName) // Loop through required columns
-            {
-                @* var count1 = 0;
-        var count2 = 0;
-        var count3 = 0; *@
-                <!-- Display column name -->
-                @foreach (var row in Model.TableData) // Loop through each row to get column values
+        <div class="table-container scrollHeader"> <!-- New wrapper div -->
+            <div class="table-row"> <!-- Inner div for horizontal scrolling -->
+
+                <!-- Color Count Box -->
+                @if (Model.ColorAliasName != null)
                 {
-                    if (row.ContainsKey(col)) // Check if column exists in the row
+                    <div class="col-lg-1 col-md-1 col-sm-6 col-xs-12 RptCol">
+                        <div class="maindiv">
+                            <label>Total</label>
+                            <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="@Model.TableData.Count">
+
+                            <label>@Model.ColorValue2 &amp; Above</label>
+                            <input type="button" name=">100" id="tbeCountDisplay" class="form-control" value="@count3" style="background-color: @Model.ColorCode3;">
+                        </div>
+                    </div>
+                    <div class="col-lg-1 col-md-1 col-sm-6 col-xs-12 RptCol">
+                        <div class="maindiv">
+                            <label>Less Than @Model.ColorValue2</label>
+                            <input type="button" name="GAGoals" id="storeCountDisplay1" class="form-control" value="@count2" style="background-color: @Model.ColorCode2;">
+
+                            <label>Less Than @Model.ColorValue1</label>
+                            <input type="button" name=">100" id="tbeCountDisplay1" class="form-control" value="@count1" style="background-color: @Model.ColorCode1;">
+                        </div>
+                    </div>
+                }
+
+                <!-- ShowCard Box -->
+                @if (Model.ShowCard != null)
+                {
+                    var columnsToShow = Model.ShowCard.Keys.ToList();
+                    int totalColumns = columnsToShow.Count;
+                    @for (int i = 0; i < totalColumns; i++)
                     {
-                        var data = row[col]; // Get column data
-
-                        if (row[col] != null && float.TryParse(row[col].ToString(), out float dataValue))
-                        {
-                            if (dataValue < Model.ColorValue1)
-                            {
-                                count1 += 1;
-                            }
-                            else if (dataValue >= Model.ColorValue1 && dataValue < Model.ColorValue2)
-                            {
-                                count2 += 1;
-                            }
-                            else if (dataValue >= Model.ColorValue2)
-                            {
-                                count3 += 1;
-                            }
-                        }
-
+                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-12 text-center">
+                            <div class="maindivshow">
+                                <label class="collabel">@columnsToShow[i]</label>
+                                @if(Model.TotalSum != null) {
+                                    @foreach (var row in Model.TotalSum)
+                                    {
+                                        if (row.ContainsKey(columnsToShow[i]))
+                                        {
+                                            <input type="button" class="showcardinput" value="@row[columnsToShow[i]]" readonly />
+                                        }
+                                    }
+                                }
+                            </div>
+                        </div>
                     }
                 }
-            }
 
-            <div class="col-lg-1 col-md-2 col-sm-12 col-xs-12 RptCol">
-                <div class="maindiv">
-                    <label>Total</label>
-                    <input type="button" name="GAGoals" id="storeCountDisplay" class="form-control" value="@Model.TableData.Count">
+                <!-- Filter Box -->
+                @if (Model.isFilterCol != null)
+                {
+                    @foreach (var column in Model.isFilterCol as List<string>)
+                    {
+                        var columnId = column.Replace(" ", ""); // Remove spaces to create valid IDs
+                        <div class="col-sm-2 filterBox mx-1">
+                            <input type="text"
+                                name="textSearch@columnId"
+                                id="textSearch@columnId"
+                                class="selectorinput form-control"
+                                placeholder="Search @column"
+                                data-column="@columnId" />
 
-                    <label>@Model.ColorValue2 &amp; Above</label>
-                    <input type="button" name=">100" id="tbeCountDisplay" class="form-control" value="@count3" style="background-color: @Model.ColorCode3;">
-                </div>
-            </div>
-            <div class="col-lg-1 col-md-2 col-sm-12 col-xs-12 RptCol">
-                <div class="maindiv">
-                    <label>Less Than @Model.ColorValue2</label>
-                    <input type="button" name="GAGoals" id="storeCountDisplay1" class="form-control" value="@count2" style="background-color: @Model.ColorCode2;">
+                                <select class="form-control filter-dropdown mt-1" id="dropdown_@columnId" size="5" data-column="@columnId">
+                                    @foreach (var value in Model.TableData
+                                    .Where(data => data.ContainsKey(column))
+                                    .Select(data => data[column]?.ToString())
+                                    .Distinct())
+                                    {
+                                        <option class="optionfilter" style="background-color: @Model.Color;" value="@value" title="@value">@value</option>
+                                    }
+                                </select>
+                        </div>
+                    }
+                }
 
-                    <label>Less Than @Model.ColorValue1</label>
-                    <input type="button" name=">100" id="tbeCountDisplay1" class="form-control" value="@count1" style="background-color: @Model.ColorCode1;">
-                </div>
-            </div>
-        }
-
-
-        @if (Model.isFilterCol != null)
-        {
-            @foreach (var column in Model.isFilterCol as List<string>)
-            {
-                var columnId = column.Replace(" ", ""); // Remove spaces to create valid IDs
-                <div class="col-sm-2">
-                    <!-- Input Textbox -->
-                    <input type="text"
-                           name="textSearch@columnId"
-                           id="textSearch@columnId"
-                           class="selectorinput form-control"
-                           placeholder="Search @column..."
-                           data-column="@columnId" />
-
-                    <!-- Dropdown -->
-                    <select class="form-control filter-dropdown mt-1" id="dropdown_@columnId" size="5" data-column="@columnId">
-                        @foreach (var value in Model.TableData
-                       .Where(data => data.ContainsKey(column))
-                       .Select(data => data[column]?.ToString())
-                       .Distinct())
-                        {
-                            <option class="optionfilter" style="background-color: @Model.Color;" value="@value" title="@value">@value</option>
-                        }
-                    </select>
-                </div>
-            }
-        }
+            </div> <!-- End of table-row -->
+        </div> <!-- End of table-container -->
     </div>
 
 

@@ -19,13 +19,6 @@
 
 }
 
-@* @{
-    var TotalCount = 0;
-    var ColorCodeCnt1 = 0;
-    var ColorCodeCnt2 = 0;
-    var ColorCodeCnt3 = 0;
-} *@
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -57,294 +50,20 @@
         .odd-row {
             background-color: @Model.AlternateRowColor !important;
         }
-
     </style>
 
-    <script>
-        $(document).ready(function () {
-            $(".selectorinput").on("keyup", function () {
-                let columnId = $(this).attr("data-column");
-                let input = $(this).val().toLowerCase();
-
-                let $dropdown = $("#dropdown_" + columnId);
-                if ($dropdown.length) {
-                    $dropdown.find("option").each(function () {
-                        $(this).toggle($(this).text().toLowerCase().includes(input));
-                    });
-                }
-            });
-            // $("#dataTable tbody tr").each(function () {
-            //     let $row = $(this);
-            //     let $td = $row.find(`[data-column='${columnId}']`);
-            //     let isGrandTotal = $row.attr("id") === "grandTotalRow";
-
-            //     if (isGrandTotal) {
-            //         $row.show();
-            //     } else if ($td.length) {
-            //         let textValue = $td.text().toLowerCase();
-            //         $row.toggle(textValue.includes(input));
-            //     }
-            // });
-
-            // Handle clicking an option in the dropdown to filter data
-            // $(".filter-dropdown").on("click", "option", function () {
-            //     let columnId = $(this).closest(".filter-dropdown").attr("data-column");
-            //     let selectedValue = $(this).val().toLowerCase();
-
-            //     // Filter the table based on the selected dropdown option
-            //     $("#dataTable tbody tr").each(function () {
-            //         let $row = $(this);
-            //         let $td = $row.find(`[data-column='${columnId}']`);
-            //         let isGrandTotal = $row.attr("id") === "grandTotalRow";
-
-            //         if (isGrandTotal) {
-            //             $row.show();
-            //         } else if ($td.length) {
-            //             let textValue = $td.text().toLowerCase();
-            //             if (selectedValue === "" || textValue.includes(selectedValue)) {
-            //                 $row.show();
-            //             } else {
-            //                 $row.hide();
-            //             }
-            //         }
-            //     });
-
-            //     // Disable the filter dropdowns to the left of the selected column
-            //     let columnIndex = $(".filter-dropdown").index($(this).closest(".filter-dropdown"));
-            //     $(".filter-dropdown").each(function (index) {
-            //         if (index < columnIndex) {
-            //             $(this).prop("disabled", true).find('.optionfilter').css('background-color', '#7b7c7f');
-            //         } else {
-            //             $(this).prop("disabled", false);
-            //         }
-            //     });
-            // });
-        });
-
-    </script>
-
-    <script>
-            $(document).ready(function () {
-                // $("#selectedDate").on("change", function () {
-
-                //     let selectedDate = $(this).val();
-
-                //     if (!selectedDate) {
-                //         console.warn("No date selected.");
-                //         return;
-                //     }
-
-                //     if ($("#dataTable").length === 0) {
-                //         alert("Records are not available.");
-                //         return;
-                //     }
-
-                //     let rowsFound = false;
-                //     $("#dataTable tbody tr").each(function () {
-                //         let $row = $(this);
-
-                //         let timeStamp = $row.find("[data-column='TimeStamp']").text().trim();
-                //         let dateKey = $row.find("[data-column='DateKey']").text().trim();
-                //         let formattedTimeStampDate = "";
-                //         let formattedDateKeyDate = "";
-
-                //         if (timeStamp && timeStamp !== '--') {
-                //             let datePart = timeStamp.split(" ")[0];
-                //             formattedTimeStampDate = datePart.replace(/(\d{2})-(\d{2})-(\d{4})/, "$3-$2-$1");
-                //         }
-
-                //         if (dateKey && dateKey !== '--') {
-                //             formattedDateKeyDate = dateKey.replace(/(\d{4})(\d{2})(\d{2})/, "$1-$2-$3");
-                //         }
-
-                //         if (formattedTimeStampDate === selectedDate || formattedDateKeyDate === selectedDate) {
-                //             $row.show();
-                //             rowsFound = true;
-                //         } else {
-                //             $row.hide();
-                //         }
-
-                //         if ((!formattedTimeStampDate || formattedTimeStampDate === '--') && (!formattedDateKeyDate || formattedDateKeyDate === '--')) {
-                //             $row.hide();
-                //         }
-                //     });
-
-                //     if (!rowsFound) {
-                //         alert("No records available for the selected date.");
-                //         //refresh();
-                //     }
-                // });
-                // $("#selectedDate").change(function () {
-                //     var selectedDate = $(this).val();
-                //     if (selectedDate) {
-                //         //fetchData(selectedDate);
-                //         window.location.href = '/DynamicData/Index?selectedDate=' + selectedDate;
-                //     }
-                // });
-                $(".selectorinput").on("keyup", function () {
-                    let columnId = $(this).attr("data-column");
-                    let input = $(this).val().toLowerCase();
-
-                    let $dropdown = $("#dropdown_" + columnId);
-                    if ($dropdown.length) {
-                        $dropdown.find("option").each(function () {
-                            $(this).toggle($(this).text().toLowerCase().includes(input));
-                        });
-                    }
-                });
-
-            $("#selectedDate").change(function () {
-                var selectedDate = $(this).val();
-                var columnId = $(this).data('column');
-                var selectedValue = $("#dropdown_" + columnId).val();
-
-                if (selectedDate || selectedValue) {
-                    fetchData(selectedDate, columnId, selectedValue);
-                    setTableMargin();
-                }
-            });
-
-            // When the dropdown selection changes
-            $(".filter-dropdown").change(function () {
-                var columnId = $(this).data('column');
-                var selectedDate = $("#selectedDate").val();
-                var selectedValue = $(this).val();
-
-                if (selectedDate || selectedValue) {
-                    fetchData(selectedDate, columnId, selectedValue);
-                    setTableMargin();
-                }
-            });
-
-            nonFixColor();
-            fixedCol();
-
-        });
-
-            // Fetch data based on the selectedDate, columnId, and selectedValue
-            function fetchData(dateParam, columnId, selectedValue) {
-
-                // Extract reportId from the URL path
-                var pathSegments = window.location.pathname.split('/'); // Split URL by "/"
-                var reportId = pathSegments[pathSegments.length - 1]; // Get the last segment
-
-                $.ajax({
-                    url: '/DynamicData/Index',
-                    type: 'GET',
-                    data: {
-                        reportId: reportId,
-                        selectedDate: dateParam,
-                        columnId: columnId,
-                        selectedValue: selectedValue
-                    },
-                    success: function (data) {
-                        // Update the table content dynamically
-                        $("#dataTable").html(data); // Update the table content in the page
-                    },
-                    error: function (error) {
-                        console.error("Error fetching data", error);
-                    }
-                });
-            }
-
-            function setTableStyles() {
-                $("table").css({
-                    "margin-top": "50px",
-                    "width": "100%" // Ensures the table width remains full
-                });
-            }
-
-            function nonFixColor() {
-                var colorCode = '@Model.Color';
-                var elements = document.getElementsByClassName('non-fixed-column');
-
-                for (var i = 0; i < elements.length; i++) {
-                    elements[i].style.setProperty('background-color', colorCode, 'important');
-                }
-            }
-
-
-
-        function fixedCol() {
-            /* Reload the page when View Change Begin */
-            let lastViewportWidth = sessionStorage.getItem('lastViewportWidth');
-            let currentWidth = window.innerWidth;
-
-            function checkAndReload() {
-                let newWidth = window.innerWidth;
-                if (lastViewportWidth !== newWidth) {
-                    sessionStorage.setItem('lastViewportWidth', newWidth);
-                    location.reload();
-                }
-            }
-            if (!lastViewportWidth) {
-                sessionStorage.setItem('lastViewportWidth', currentWidth);
-            }
-            window.addEventListener('resize', function () {
-                checkAndReload();
-            });
-            /* Reload the page when View Change End */
-
-            /* Dynamic fixed column handle Begin */
-            // Get fixed columns from Razor model
-            var fixedColumns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.isFixedCol));
-            if (fixedColumns.length > 0) {
-                let leftPosition = 0;
-                let zIndex = 10;
-
-                // Find column indexes dynamically
-                let headers = document.querySelectorAll("thead tr:nth-child(2) th");
-                let columnIndexMap = {};
-
-                headers.forEach((th, index) => {
-                    let columnName = th.textContent.trim();
-                    if (fixedColumns.includes(columnName)) {
-                        columnIndexMap[columnName] = index + 1;
-                    }
-                });
-
-                // Apply sticky styles to fixed columns
-                Object.keys(columnIndexMap).forEach((colName) => {
-                    let index = columnIndexMap[colName];
-
-                    // Calculate the actual width of the column
-                    let firstCell = document.querySelector(`th:nth-child(${index})`);
-                    let columnWidth = firstCell ? firstCell.offsetWidth : 100;
-
-                    document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
-                        cell.classList.add("fixed-column");
-                        cell.style.left = `${leftPosition}px`;
-                        cell.style.zIndex = zIndex;
-                        cell.style.minWidth = `${columnWidth}px`;
-                        cell.style.maxWidth = `${columnWidth}px`;
-                    });
-
-                    // Increment leftPosition based on actual column width
-                    leftPosition += columnWidth;
-                    zIndex++;
-                });
-            }
-            /* Dynamic fixed column handle End */
-        }
-    </script>
-
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            var colorCode = '@Model.Color';
-            var elements = document.getElementsByClassName('non-fixed-column');
-
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].style.setProperty('background-color', colorCode, 'important');
-            }
-        });
-    </script>
+    
 
 </head>
-@await Html.PartialAsync("_HeaderSection")
-<body class="body-scrollbar">
+
+
+
+<body class="body-scrollbar" id="wholepage">
+
+    @await Html.PartialAsync("_HeaderSection") <!-- Always render -->
 
     <!-- Data Table -->
-    <div class="table-container">
+    <div class="table-container" id="dataContainer">
         <table id="dataTable" class="table table-striped">
             <thead class="table-dark">
                 <tr class="firstRowAlphabet">
@@ -353,6 +72,7 @@
                         <th>@column</th>
                     }
                 </tr>
+
                 <tr>
                     @* @foreach (var field in orderedColumns) *@
                     @foreach (var field in orderedColumnsAlias)
@@ -377,8 +97,8 @@
                                     @if (row.ContainsKey(field.column))
                                     {
                                         var value = row[field.column];
-                                        if (Model.ShowCard.ContainsKey(field.column))
-                                        {
+                                        @* if (Model.ShowCard.ContainsKey(field.column))
+                                        { *@
                                             if (Model.NoOfDecimal.ContainsKey(field.column))
                                             {
                                                 var decimalPlaces = Model.NoOfDecimal[field.column];
@@ -419,7 +139,7 @@
                                             {
                                                 @value
                                             }
-                                        }
+                                        //}
                                     }
                                     else if (field.index == 3)
                                     {
@@ -919,24 +639,113 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            fixedColFunc();
+            nonFixColorFunc();
+        });
+    </script>
 
-            /* Reload the page when View Change Begin */
-            let lastViewportWidth = sessionStorage.getItem('lastViewportWidth');
-            let currentWidth = window.innerWidth;
+    <script>
+        $(document).ready(function () {
 
-            function checkAndReload() {
-                let newWidth = window.innerWidth;
-                if (lastViewportWidth !== newWidth) {
-                    sessionStorage.setItem('lastViewportWidth', newWidth);
-                    location.reload();
+            // for input text filter
+            $(".selectorinput").on("keyup", function () {
+                let columnId = $(this).attr("data-column");
+                let input = $(this).val().toLowerCase();
+
+                let $dropdown = $("#dropdown_" + columnId);
+                if ($dropdown.length) {
+                    $dropdown.find("option").each(function () {
+                        $(this).toggle($(this).text().toLowerCase().includes(input));
+                    });
                 }
-            }
-            if (!lastViewportWidth) {
-                sessionStorage.setItem('lastViewportWidth', currentWidth);
-            }
-            window.addEventListener('resize', function () {
-                checkAndReload();
             });
+
+            // date picket filter
+            $(document).on("change", "#selectedDate", function () {
+                var selectedDate = $(this).val();
+                var columnId = $(this).data('column');
+                var selectedValue = $("#dropdown_" + columnId).val();
+
+                if (selectedDate || selectedValue) {
+                    fetchData(selectedDate, columnId, selectedValue);
+                }
+            });
+
+            // When click on the dropdown selection changes
+            $(".filter-dropdown").change(function () {
+                var columnId = $(this).data('column');
+                var selectedDate = $("#selectedDate").val();
+                var selectedValue = $(this).val();
+
+                if (selectedDate || selectedValue) {
+                    fetchData(selectedDate, columnId, selectedValue);
+                }
+            });
+
+            nonFixColorFunc();
+            fixedColFunc();
+        });
+
+    </script>
+
+    <script>
+        // all Js function
+
+        // Fetch data based on the selectedDate, columnId, and selectedValue
+        function fetchData(dateParam, columnId, selectedValue) {
+
+            // Extract reportId from the URL path
+            var pathSegments = window.location.pathname.split('/'); // Split URL by "/"
+            var reportId = pathSegments[pathSegments.length - 1]; // Get the last segment
+
+            $.ajax({
+                url: '/DynamicData/Index',
+                type: 'GET',
+                data: {
+                    reportId: reportId,
+                    selectedDate: dateParam,
+                    columnId: columnId,
+                    selectedValue: selectedValue
+                },
+                success: function (data) {
+                    //$("#dataTable").html(data); // Update the table content in the page
+                    $("#wholepage").html(data); // Update the table content in the page
+                },
+                error: function (error) {
+                    console.error("Error fetching data", error);
+                }
+            });
+        }
+
+        // non-fixed column color set
+        function nonFixColorFunc() {
+            var colorCode = '@Model.Color';
+            var elements = document.getElementsByClassName('non-fixed-column');
+
+            for (var i = 0; i < elements.length; i++) {
+                elements[i].style.setProperty('background-color', colorCode, 'important');
+            }
+        }
+
+        // for fixed column
+        function fixedColFunc() {
+            /* Reload the page when View Change Begin */
+            // let lastViewportWidth = sessionStorage.getItem('lastViewportWidth');
+            // let currentWidth = window.innerWidth;
+
+            // function checkAndReload() {
+            //     let newWidth = window.innerWidth;
+            //     if (lastViewportWidth !== newWidth) {
+            //         sessionStorage.setItem('lastViewportWidth', newWidth);
+            //         location.reload();
+            //     }
+            // }
+            // if (!lastViewportWidth) {
+            //     sessionStorage.setItem('lastViewportWidth', currentWidth);
+            // }
+            // window.addEventListener('resize', function () {
+            //     checkAndReload();
+            // });
             /* Reload the page when View Change End */
 
             /* Dynamic fixed column handle Begin */
@@ -979,8 +788,7 @@
                 });
             }
             /* Dynamic fixed column handle End */
-        });
-
+        }
     </script>
 
 </body>

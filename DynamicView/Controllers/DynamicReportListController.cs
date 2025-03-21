@@ -18,7 +18,7 @@ namespace DynamicView.Controllers
             DynamicReportListModel model = new DynamicReportListModel();
             try
             {
-                var reportList = await _dbService.GetDynamicReportsAsync();
+                var reportList = await _dbService.GetDynamicReportListAsync();
                 model.ReportList = reportList.ToDictionary(r => r.ReportID, r => r.ReportName); ;
             }
             catch (Exception ex)

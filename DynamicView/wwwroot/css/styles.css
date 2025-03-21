@@ -18,8 +18,8 @@
 
 /* Custom scrollbar styles for WebKit browsers */
 .body-scrollbar::-webkit-scrollbar {
-    width: 12px; /* Width of the vertical scrollbar */
-    height: 12px; /* Height of the horizontal scrollbar */
+    width: 8px; /* Width of the vertical scrollbar */
+    height: 10px; /* Height of the horizontal scrollbar */
 }
 
 .body-scrollbar::-webkit-scrollbar-thumb {
@@ -39,11 +39,12 @@
     position:center !important;
 }*/
 
-.filterClass {
+/*.filterClass {
     background-color: white !important;
     margin-left:1px;
     margin-right: -1px;
-}
+    overflow-x:auto;
+}*/
 
 .searchBarFilter .col-md-2,
 .searchBarFilterData .col-md-2 {
@@ -69,7 +70,8 @@ table {
     table-layout: auto; /* Allow columns to adjust width dynamically */
     /* border-collapse: collapse; */
     border-collapse: separate;
-    margin-top: 105px;
+    margin-top: 122px;
+    height:auto;
 }
 
 th {
@@ -111,7 +113,7 @@ tbody, tr, td {
     height: 20px;
     margin-bottom: 10px;
     padding: 0px 0 !important;
-    width:50px;
+    width:40px;
 }
 
 #storeCountDisplay {
@@ -135,12 +137,20 @@ tbody, tr, td {
 
 
 .optionfilter {
-    font-size: 10px;
+    font-size: 9px;
     background-color: rgb(58, 117, 208);
     color: white;
     border-radius: 6px;
     text-align: center;
     margin-bottom: 5px;
+}
+
+.selectorinput::placeholder {
+    font-size:12px;
+}
+
+.filterBox {
+    width: 10%;
 }
 
 .dropdownSearchBar {

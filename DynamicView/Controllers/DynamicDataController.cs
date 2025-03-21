@@ -46,15 +46,6 @@ public class DynamicDataController : Controller
                     var storedProcName = firstRow["DataProc"]?.ToString();
                     var parameters = new Dictionary<string, object>();
 
-                    // Add selectedDate if it's provided
-                    //if (!string.IsNullOrEmpty(selectedDate))
-                    //{
-                    //    parameters.Add("@Date", selectedDate);
-                    //}
-                    //else
-                    //{
-                    //    parameters.Add("@Date", DBNull.Value);
-                    //}
                     parameters.Add("@UserID", string.IsNullOrEmpty(userId) ? DBNull.Value : userId);
                     parameters.Add("@Date", string.IsNullOrEmpty(selectedDate) ? DBNull.Value : selectedDate);
 
@@ -63,14 +54,7 @@ public class DynamicDataController : Controller
                     {
                         parameters.Add($"@{columnId}", selectedValue);
                     }
-
-                    //foreach (DataColumn column in firstRow.Table.Columns)
-                    //{
-                    //    parameters[column.ColumnName] = firstRow[column.ColumnName];
-                    //}
-
                     model.TableData = await _dbService.DataAsync(storedProcName, parameters);
-                    //model.TableDataCount = (await _dbService.DataAsync(storedProcName, parameters)).Count;
                 }
 
                 if (firstRow.Table.Columns.Contains("GrandTotalProc"))
@@ -88,12 +72,6 @@ public class DynamicDataController : Controller
                         {
                             parameters.Add($"@{columnId}", selectedValue);
                         }
-
-                        //foreach (DataColumn column in firstRow.Table.Columns)
-                        //{
-                        //    parameters[column.ColumnName] = firstRow[column.ColumnName];
-                        //}
-
                         model.TotalSum = await _dbService.TotalAsync(totalCountProc, parameters);
                     }
 
@@ -147,7 +125,7 @@ public class DynamicDataController : Controller
 
             if (sixthTable != null && sixthTable.Columns.Contains("SubTotalProc") && sixthTable.Rows.Count > 0)
             {
-                model.SubTotalResults = new List<Dictionary<string, object>>(); // ✅ Correct initialization
+                model.SubTotalResults = new List<Dictionary<string, object>>(); 
 
                 foreach (DataRow row in sixthTable.Rows)
                 {
@@ -156,7 +134,7 @@ public class DynamicDataController : Controller
                     if (!string.IsNullOrEmpty(storedProcName))
                     {
                         // Execute the stored procedure using Data Access Layer
-                        var resultData = await _dbService.ExecuteStoredProcedureAsync(storedProcName);
+                        var resultData = await _dbService.SubTotalProcedureAsync(storedProcName);
 
                         if (storedProcName == "GetFct_StoreNumberTotalMMM")
                         {
@@ -241,32 +219,6 @@ public class DynamicDataController : Controller
         }
         return View(model);
     }
-
-
-    public async Task<IActionResult> DynamicList()
-    {
-        //DynamicListModel model = new DynamicListModel();
-        DynamicDataModel model = new DynamicDataModel();
-        // Fetch data from the DbService
-        var reportList= await _dbService.GetDynamicReportsAsync();
-        model.ReportList = reportList.ToDictionary(r => r.ReportID, r => r.ReportName); ;
-        // Pass the model to the view
-        //ViewBag.Reports = model;
-
-        return View(model);
-    }
-
-    //public async Task<IActionResult> DynamicListByReport(int reportID)
-    //{
-    //    // Fetch data based on the ReportID
-    //    var model = await _dbService.GetReportByIDAsync(reportID);
-
-    //    // Pass the model to the view
-    //    ViewBag.Reports = model;
-
-    //    return View("DynamicList", model); // Return the same view or a different one
-    //}
-
 
     // Helper method to generate column names (Excel-style)
     public List<string> CommonNameHelper(int numberOfColumns)
