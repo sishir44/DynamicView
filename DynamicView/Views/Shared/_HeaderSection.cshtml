@@ -40,24 +40,41 @@
 }
 
 <style>
+  
     .maindivshow {
         display: flex;
-        flex-direction: column;
-        align-items: center;
-        text-align: center;
-        margin: 5px;
+        flex-wrap: nowrap; /* Prevents wrapping into a new row */
+        justify-content: flex-start; /* Aligns items properly */
+        gap: normal; /* Space between sub-columns */
+        max-width: 100%; /* Ensures it doesn't break to the next line */
+        white-space:nowrap;
     }
+
+    // .sub-column {
+    //     display: flex;
+    //     flex-direction: column;
+    //     gap: 5px;
+    //     border: 1px solid green;
+    //     padding: 10px;
+    //     min-width: 180px; /* Adjust width as needed */
+    //     align-items: center;
+    //     background-color: #f9f9f9;
+    //     border-radius: 6px;
+    // }
+
 
     .collabel {
         font-size: 9px;
         font-weight: bold;
         /* text-align: center; */
         margin-bottom: 5px;
-        white-space: pre-line; /* Prevents text wrapping */
-        word-break: break-word; /* Ensures long words wrap */
+        white-space: nowrap; /* Prevents text wrapping */
+        word-break: normal; /* Ensures long words wrap */
         overflow-wrap: break-word; /* Alternative way to break long words */
-        max-width: 150px; /* Adjust width as needed */
+        max-width: 100%; /* Adjust width as needed */
         display: block; /* Ensures it works properly */
+        text-overflow: ellipsis; /* Optional: Adds '...' if text is too long */
+        overflow: hidden; /* Optional: Hides overflowing text if it exceeds max-width */
     }
 
     .maindivshow input.showcardinput {
@@ -66,7 +83,7 @@
         width: 50px;
         border-radius: 6px;
         text-align: center;
-        background-color: beige;
+        background-color: lightblue;
         border: 1px solid #ccc;
     }
 
@@ -81,13 +98,14 @@
         margin-left: 1px;
         margin-right: -1px;
         overflow-x: auto;
+        width:auto;
     }
 
     /* New scrollable container */
     .scrollHeader {
         width: 100%;
         overflow-x: auto;
-        white-space: nowrap;
+        white-space:normal;
         padding-bottom: 10px;
     }
 
@@ -117,8 +135,6 @@
     }
 </style>
 
-
-
 <header>
     <nav class="navbar navbar-expand-sm navbar-toggleable-sm" style="color: black; background-color:@Model.Color;">
         <div class="container-fluid">
@@ -132,7 +148,6 @@
             </div>
         </div>
     </nav>
-
 
     <div class="row filterClass mt-1">
         <div class="table-container scrollHeader"> <!-- New wrapper div -->
@@ -166,24 +181,45 @@
                 {
                     var columnsToShow = Model.ShowCard.Keys.ToList();
                     int totalColumns = columnsToShow.Count;
-                    @for (int i = 0; i < totalColumns; i++)
-                    {
-                        <div class="col-lg-1 col-md-1 col-sm-6 col-xs-12 text-center">
-                            <div class="maindivshow">
-                                <label class="collabel">@columnsToShow[i]</label>
-                                @if(Model.TotalSum != null) {
-                                    @foreach (var row in Model.TotalSum)
+
+                    <div class="col-lg-auto col-md-auto col-sm-6 col-xs-12 text-center" style="width: auto;">
+                        <div class="maindivshow d-flex">
+                            @for (int i = 0; i < totalColumns; i += 2) // Process two items per sub-column
+                            {
+                                <div class="sub-column">
+                                    <!-- Sub-column wrapper -->
+                                    <label class="collabel">@columnsToShow[i]</label>
+                                    @if (Model.GrandTotalSum != null)
                                     {
-                                        if (row.ContainsKey(columnsToShow[i]))
+                                        @foreach (var row in Model.GrandTotalSum)
                                         {
-                                            <input type="button" class="showcardinput" value="@row[columnsToShow[i]]" readonly />
+                                            if (row.ContainsKey(columnsToShow[i]))
+                                            {
+                                                <input type="button" class="showcardinput" value="@row[columnsToShow[i]]" readonly />
+                                            }
                                         }
                                     }
-                                }
-                            </div>
+
+                                    @if (i + 1 < totalColumns) // Check if second row exists
+                                    {
+                                        <label class="collabel">@columnsToShow[i + 1]</label>
+                                        @if (Model.GrandTotalSum != null)
+                                        {
+                                            @foreach (var row in Model.GrandTotalSum)
+                                            {
+                                                if (row.ContainsKey(columnsToShow[i + 1]))
+                                                {
+                                                    <input type="button" class="showcardinput" value="@row[columnsToShow[i + 1]]" readonly />
+                                                }
+                                            }
+                                        }
+                                    }
+                                </div>
+                            }
                         </div>
-                    }
+                    </div>
                 }
+
 
                 <!-- Filter Box -->
                 @if (Model.isFilterCol != null)
@@ -212,8 +248,8 @@
                     }
                 }
 
-            </div> <!-- End of table-row -->
-        </div> <!-- End of table-container -->
+            </div> 
+        </div> 
     </div>
 
 

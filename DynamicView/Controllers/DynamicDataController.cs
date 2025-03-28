@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Data;
 using System.Linq;
+using System.Xml;
 
 public class DynamicDataController : Controller
 {
@@ -21,153 +22,192 @@ public class DynamicDataController : Controller
 
         try
         {
-            var result = _dbService.GetDynamicReportNew(reportId);
-            var firstTable = result.resultSet1[0]; // data col header and color
-            var secondTable = result.resultSet2[0]; // AttributeName, alisa name for col
-            var thirdTable = result.resultSet3[0]; // isFixed for Desktop
-            var fourthTable = result.resultSet4[0]; // is Fixed for Mobile
-            var fifthTable = result.resultSet5[0];  // isFilter
-            var sixthTable = result.resultSet6[0]; // subtotal
-            var sevenTable = result.resultSet7[0]; // No of Decimal
-            var eightTable = result.resultSet8[0]; // color code
-            var nineTable = result.resultSet9[0]; // percentage ratio 
-            var ShowCardTbl = result.resultSet10[0]; // showCard for grand Total
+            // execute all the table from GetDynamicReport stp
+            var resultSet = await Task.Run(() => _dbService.Fnc_GetDynamicReport(reportId));
 
-            var firstRow = firstTable?.Rows.Cast<DataRow>().FirstOrDefault();
+            model.FirstTable = resultSet[0];  // Data column header and color
+            model.SecondTable = resultSet[1]; // AttributeName, alias name for columns
+            model.ThirdTable = resultSet[2];  // isFixed for Desktop
+            model.FourthTable = resultSet[3]; // isFixed for Mobile
+            model.FifthTable = resultSet[4];  // isFilter Column
+            model.SixthTable = resultSet[5];  // Subtotal Column
+            model.SeventhTable = resultSet[6]; // No of Decimals 
+            model.EighthTable = resultSet[7]; // Color code Column
+            model.NinthTable = resultSet[8];  // Percentage ratio 
+            model.ShowCardTbl = resultSet[9]; // ShowCard for Grand Total
+
             // get col header, data and color
+            var firstRow = model.FirstTable?.Rows.Count > 0 ? model.FirstTable.Rows[0] : null;
             if (firstRow != null)
             {
                 model.ReportName = firstRow["RepName"]?.ToString();
                 model.Color = firstRow["ColorCode"]?.ToString();
                 model.AlternateRowColor = firstRow["AlternateRowColor"]?.ToString();
 
+                // Function to prepare dynamic parameters
+                Dictionary<string, object> PrepareParameters()
+                {
+                    var parameters = new Dictionary<string, object>
+                    {
+                        { "@UserID", string.IsNullOrEmpty(userId) ? DBNull.Value : userId },
+                        { "@Date", string.IsNullOrEmpty(selectedDate) ? DBNull.Value : selectedDate }
+                    };
+
+                    if (!string.IsNullOrEmpty(columnId) && !string.IsNullOrEmpty(selectedValue))
+                    {
+                        parameters.TryAdd($"@{columnId}", selectedValue);
+                    }
+                    return parameters;
+                }
+
+                // Handle DataProc (Load Table Data)
                 if (firstRow.Table.Columns.Contains("DataProc"))
                 {
                     var storedProcName = firstRow["DataProc"]?.ToString();
-                    var parameters = new Dictionary<string, object>();
-
-                    parameters.Add("@UserID", string.IsNullOrEmpty(userId) ? DBNull.Value : userId);
-                    parameters.Add("@Date", string.IsNullOrEmpty(selectedDate) ? DBNull.Value : selectedDate);
-
-                    // Dynamically add parameters based on columnId and selectedValue
-                    if (!string.IsNullOrEmpty(columnId) && !string.IsNullOrEmpty(selectedValue))
+                    if (!string.IsNullOrWhiteSpace(storedProcName))
                     {
-                        parameters.Add($"@{columnId}", selectedValue);
+                        model.TableData = await _dbService.Fnc_LoadDataAsync(storedProcName, PrepareParameters());
                     }
-                    model.TableData = await _dbService.DataAsync(storedProcName, parameters);
                 }
 
+                // Handle GrandTotalProc (Load Total Sum)
                 if (firstRow.Table.Columns.Contains("GrandTotalProc"))
                 {
                     var totalCountProc = firstRow["GrandTotalProc"]?.ToString();
-                    
-                    if (totalCountProc != "N/A" && totalCountProc != "")
+                    if (!string.IsNullOrWhiteSpace(totalCountProc) && totalCountProc != "N/A")
                     {
-                        var parameters = new Dictionary<string, object>();
-                        parameters.Add("@UserID", string.IsNullOrEmpty(userId) ? DBNull.Value : userId);
-                        parameters.Add("@Date", string.IsNullOrEmpty(selectedDate) ? DBNull.Value : selectedDate);
-
-                        // Dynamically add parameters based on columnId and selectedValue
-                        if (!string.IsNullOrEmpty(columnId) && !string.IsNullOrEmpty(selectedValue))
-                        {
-                            parameters.Add($"@{columnId}", selectedValue);
-                        }
-                        model.TotalSum = await _dbService.TotalAsync(totalCountProc, parameters);
+                        model.GrandTotalSum = await _dbService.Fnc_GrandTotalAsync(totalCountProc, PrepareParameters());
                     }
 
                 }
             }
 
             // get the AttributeName name for table
-            if (secondTable != null)
+            if (model.SecondTable != null)
             {
-                model.FieldNames = secondTable.Columns.Contains("AttributeName") ? secondTable.AsEnumerable().Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                                  .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
-                model.FieldNamesAlias = secondTable.Columns.Contains("Alias") ? secondTable.AsEnumerable().Select(row => row["Alias"]?.ToString().Trim('[', ']'))
-                                  .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
+                // Extract FieldNames(AttributeName to handle the data)
+                model.FieldNames = model.SecondTable.Columns.Contains("AttributeName")
+                    ? model.SecondTable.AsEnumerable()
+                        .Select(row => row["AttributeName"]?.ToString())
+                        .Where(value => !string.IsNullOrWhiteSpace(value))
+                        .Select(value => value.Replace("[", "").Replace("]", ""))
+                        .ToList()
+                    : new List<string>();
+
+                // Extract FieldNamesAlias(Alias Name for the column heading)
+                model.FieldNamesAlias = model.SecondTable.Columns.Contains("Alias")
+                    ? model.SecondTable.AsEnumerable()
+                        .Select(row => row["Alias"]?.ToString())
+                        .Where(value => !string.IsNullOrWhiteSpace(value))
+                        .Select(value => value.Replace("[", "").Replace("]", ""))
+                        .ToList()
+                    : new List<string>();
             }
 
             if (!isMobile)
             {
-                // get the fixed col for Desktop
-                if (thirdTable != null)
-                {
-                    model.isFixedCol = thirdTable.AsEnumerable()
-                                     .Where(row => row.Field<bool?>("isFixed") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                                     .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
-                }
+                // Get the fixed columns for Desktop
+                model.isFixedCol = model.ThirdTable != null
+                    ? model.ThirdTable.AsEnumerable()
+                        .Where(row => row.Field<bool?>("isFixed") == true)
+                        .Select(row => row["AttributeName"]?.ToString()?.Replace("[", "").Replace("]", ""))
+                        .Where(attributeName => !string.IsNullOrWhiteSpace(attributeName))
+                        .ToList()
+                    : new List<string>();
             }
             else
             {
-                // get the fixed col for mobile
-                if (fourthTable != null)
+                // Get the fixed columns for Mobile
+                model.isFixedCol = model.FourthTable != null
+                    ? model.FourthTable.AsEnumerable()
+                        .Where(row => row.Field<bool?>("isFixedM") == true)
+                        .Select(row => row["AttributeName"]?.ToString()?.Replace("[", "").Replace("]", ""))
+                        .Where(attributeName => !string.IsNullOrWhiteSpace(attributeName))
+                        .ToList()
+                    : new List<string>();
+            }
+
+            // Get the filter columns
+            if (model.FifthTable != null)
+            {
+                model.isFilterCol = model.FifthTable.AsEnumerable()
+                    .Where(row => row.Field<bool?>("isFilter") == true)
+                    .Select(row => row["AttributeName"]?.ToString()?.Replace("[", "").Replace("]", ""))
+                    .Where(attributeName => !string.IsNullOrWhiteSpace(attributeName))
+                    .ToList();
+            }
+
+
+            // Get the subtotal columns
+            if (model.SixthTable != null)
+            {
+                var subTotalRows = model.SixthTable.AsEnumerable()
+                    .Where(row => row.Field<bool?>("isSubTotal") == true)
+                    .ToList();
+
+                if (subTotalRows.Any())
                 {
-                    model.isFixedCol = fourthTable.AsEnumerable()
-                                     .Where(row => row.Field<bool?>("isFixedM") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                                     .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
-                }
-            }
-            // get the filter 
-            if (fifthTable != null)
-            {
-                model.isFilterCol = fifthTable.AsEnumerable()
-                                 .Where(row => row.Field<bool?>("isFilter") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                                 .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
-            }
-            // sub total
-            if (sixthTable != null)
-            {
-                model.isSubTotalCol = sixthTable.AsEnumerable()
-                                 .Where(row => row.Field<bool?>("isSubTotal") == true).Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                                 .Where(attributeName => !string.IsNullOrEmpty(attributeName)).ToList();
-            }
+                    model.SubTotalResults = new List<Dictionary<string, object>>();
 
-
-            if (sixthTable != null && sixthTable.Columns.Contains("SubTotalProc") && sixthTable.Rows.Count > 0)
-            {
-                model.SubTotalResults = new List<Dictionary<string, object>>(); 
-
-                foreach (DataRow row in sixthTable.Rows)
-                {
-                    string storedProcName = row["SubTotalProc"]?.ToString();
-
-                    if (!string.IsNullOrEmpty(storedProcName))
+                    foreach (var row in subTotalRows)
                     {
-                        // Execute the stored procedure using Data Access Layer
-                        var resultData = await _dbService.SubTotalProcedureAsync(storedProcName);
+                        string storedProcName = row["SubTotalProc"]?.ToString();
+                        int subTotalOrder = row.Field<short?>("SubTotalOrder") ?? 0;
 
-                        if (storedProcName == "GetFct_StoreNumberTotalMMM")
+                        if (!string.IsNullOrEmpty(storedProcName))
                         {
-                            model.TotalMMM = resultData;
-                        }
-                        if (storedProcName == "GetFct_StoreNumberTotalTM")
-                        {
-                            model.TotalTM = resultData;
+                            var parameters = new Dictionary<string, object>
+                            {
+                                { "@DateParam", subTotalOrder == 1 ? new DateTime(2025, 01, 06) :
+                                                subTotalOrder == 0 ? new DateTime(2025, 02, 03) :
+                                                DBNull.Value },
+                                { "@UserID", string.IsNullOrEmpty(userId) ? (object)DBNull.Value : userId }
+                            };
+
+                            try
+                            {
+                                var resultData = await _dbService.Fnc_SubTotalProcedureAsync(storedProcName, parameters);
+                                if (subTotalOrder == 1) model.TotalMMM = resultData;
+                                else model.TotalTM = resultData;
+
+                                model.SubTotalResults.AddRange(resultData);
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"Error executing {storedProcName}: {ex.Message}");
+                            }
                         }
                     }
                 }
             }
 
             // No of decimal
-            if (sevenTable != null)
+            if (model.SeventhTable != null)
             {
-                model.NoOfDecimal = sevenTable.AsEnumerable().Where(row => row.Field<short?>("NoOfDecimal") > 0)
-                            .Select(row => new
-                            {
-                                AttributeName = row["AttributeName"]?.ToString().Trim('[', ']'),
-                                NoOfDecimal = row.Field<short?>("NoOfDecimal")
-                            }).Where(result => !string.IsNullOrEmpty(result.AttributeName)).ToDictionary(result => result.AttributeName, result => result.NoOfDecimal);
+                model.NoOfDecimal = model.SeventhTable.AsEnumerable()
+                    .Where(row => row.Field<short?>("NoOfDecimal") > 0)
+                    .Select(row => new
+                    {   
+                        AttributeName = row["AttributeName"]?.ToString().Trim('[', ']'),
+                        NoOfDecimal = row.Field<short?>("NoOfDecimal")
+                    })
+                    .Where(result => !string.IsNullOrEmpty(result.AttributeName))
+                    .ToDictionary(result => result.AttributeName, result => result.NoOfDecimal);
             }
 
             // color column and data
-            if (eightTable != null)
+            if (model.EighthTable != null)
             {
-                model.ColorAliasName = eightTable.Columns.Contains("AttributeName") ? eightTable.AsEnumerable().Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
-                                  .Where(value => !string.IsNullOrEmpty(value)).ToList() : new List<string>();
-            }
-            if (result.resultSet8 != null && result.resultSet8.Count > 0)
-            {
-                foreach (DataRow row in eightTable.Rows)
+                // Get the list of attribute names (if present)
+                model.ColorAliasName = model.EighthTable.Columns.Contains("AttributeName")
+                    ? model.EighthTable.AsEnumerable()
+                        .Select(row => row["AttributeName"]?.ToString().Trim('[', ']'))
+                        .Where(value => !string.IsNullOrEmpty(value))
+                        .ToList()
+                    : new List<string>();
+
+                // Iterate through rows to get color values and related data
+                foreach (DataRow row in model.EighthTable.Rows)
                 {
                     model.ColorValue1 = row["ColorCode1"] != DBNull.Value ? Convert.ToSingle(row["ColorCode1"]) : 0f;
                     model.ColorCode1 = row["ColorValue1"] != DBNull.Value ? row["ColorValue1"].ToString() : null;
@@ -183,26 +223,29 @@ public class DynamicDataController : Controller
                 }
             }
 
-            // Percentage Rtaio
-            if (nineTable != null)
+            // Percentage Ratio - Extracting isPercent values
+            if (model.NinthTable != null)
             {
-                model.isPercent = nineTable.AsEnumerable().Where(row => row.Field<bool?>("isPercent") == true)
-                            .Select(row => new
-                            {
-                                AttributeName = row["AttributeName"]?.ToString().Trim('[', ']'),
-                                isPercent = row.Field<bool?>("isPercent")
-                            }).Where(result => !string.IsNullOrEmpty(result.AttributeName)).ToDictionary(result => result.AttributeName, result => result.isPercent);
+                model.isPercent = model.NinthTable.AsEnumerable()
+                            .Where(row => row.Field<bool?>("isPercent") == true)
+                            .ToDictionary(
+                                row => row["AttributeName"]?.ToString().Trim('[', ']'), // Key: AttributeName
+                                row => row.Field<bool?>("isPercent") // Value: isPercent
+                            );
             }
 
-            //show card for grand total
-            if (ShowCardTbl != null)
+            // Show Card for Grand Total
+            if (model.ShowCardTbl != null)
             {
-                model.ShowCard = ShowCardTbl.AsEnumerable().Where(row => row.Field<bool?>("ShowCard") == true)
+                model.ShowCard = model.ShowCardTbl.AsEnumerable()
+                            .Where(row => row.Field<bool?>("ShowCard") == true)
                             .Select(row => new
                             {
                                 AttributeName = row["AttributeName"]?.ToString().Trim('[', ']'),
                                 ShowCard = row.Field<bool?>("ShowCard")
-                            }).Where(result => !string.IsNullOrEmpty(result.AttributeName)).ToDictionary(result => result.AttributeName, result => result.ShowCard);
+                            })
+                            .Where(result => !string.IsNullOrEmpty(result.AttributeName))
+                            .ToDictionary(result => result.AttributeName, result => result.ShowCard);
             }
 
             // Generate alphabetic column names

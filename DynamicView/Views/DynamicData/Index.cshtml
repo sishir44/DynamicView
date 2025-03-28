@@ -50,17 +50,103 @@
         .odd-row {
             background-color: @Model.AlternateRowColor !important;
         }
+
     </style>
 
-    
 
+    <script>
+
+        $(document).ready(function () {
+            //fixedColFunc();
+            //nonFixColorFunc();
+
+            /* Code for fixed Column fixed and color set begin */
+            var fixedColumns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.isFixedCol));
+            if (fixedColumns.length > 0) {
+                let leftPosition = 0;
+                let zIndex = 10;
+
+                // Find column indexes dynamically
+                let headers = document.querySelectorAll("thead tr:nth-child(2) th");
+                let columnIndexMap = {};
+
+                headers.forEach((th, index) => {
+                    let columnName = th.textContent.trim();
+                    if (fixedColumns.includes(columnName)) {
+                        columnIndexMap[columnName] = index + 1;
+                    }
+                });
+
+                // Apply sticky styles to fixed columns
+                Object.keys(columnIndexMap).forEach((colName) => {
+                    let index = columnIndexMap[colName];
+
+                    // Calculate the actual width of the column
+                    let firstCell = document.querySelector(`th:nth-child(${index})`);
+                    let columnWidth = firstCell ? firstCell.offsetWidth : 100;
+
+                    document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
+                        cell.classList.add("fixed-column");
+                        cell.style.left = `${leftPosition}px`;
+                        cell.style.zIndex = zIndex;
+                        cell.style.minWidth = `${columnWidth}px`;
+                        cell.style.maxWidth = `${columnWidth}px`;
+                    });
+
+                    // Increment leftPosition based on actual column width
+                    leftPosition += columnWidth;
+                    zIndex++;
+                });
+            }
+            /* Code for fixed Column fixed and color set end */
+
+
+            // code for non-fixed column color set
+            document.querySelectorAll('.non-fixed-column').forEach(el => el.style.backgroundColor = '@Model.Color');
+
+
+            // for input text filter
+            $(".selectorinput").on("keyup", function () {
+                let columnId = $(this).attr("data-column");
+                let input = $(this).val().toLowerCase();
+
+                let $dropdown = $("#dropdown_" + columnId);
+                if ($dropdown.length) {
+                    $dropdown.find("option").each(function () {
+                        $(this).toggle($(this).text().toLowerCase().includes(input));
+                    });
+                }
+            });
+
+            //date picket filter
+            $(document).on("change", "#selectedDate", function () {
+                var selectedDate = $(this).val();
+                var columnId = $(this).data('column');
+                var selectedValue = $("#dropdown_" + columnId).val();
+
+                if (selectedDate || selectedValue) {
+                    fetchData(selectedDate, columnId, selectedValue);
+                }
+            });
+
+            // When click on the dropdown selection changes
+            $(".filter-dropdown").change(function () {
+                var columnId = $(this).data('column');
+                var selectedDate = $("#selectedDate").val();
+                var selectedValue = $(this).val();
+
+                if (selectedDate || selectedValue) {
+                    fetchData(selectedDate, columnId, selectedValue);
+                }
+            });
+        });
+
+    </script>
 </head>
-
-
 
 <body class="body-scrollbar" id="wholepage">
 
-    @await Html.PartialAsync("_HeaderSection") <!-- Always render -->
+    @await Html.PartialAsync("_HeaderSection") 
 
     <!-- Data Table -->
     <div class="table-container" id="dataContainer">
@@ -72,24 +158,22 @@
                         <th>@column</th>
                     }
                 </tr>
-
                 <tr>
-                    @* @foreach (var field in orderedColumns) *@
                     @foreach (var field in orderedColumnsAlias)
                     {
-                        //var isFixed = fixedColumns.Contains(field); // Check if the column is fixed
                         var isFixed = fixedColumnsAlias.Contains(field); // Check if the column is fixed
                         var className = isFixed ? "fixed-column" : "non-fixed-column";
                         <th class="@className">@field</th>
                     }
                 </tr>
             </thead>
+
             <tbody>
-                @if (Model.TotalSum != null)
+                @if (Model.GrandTotalSum != null)
                 {
-                    @foreach (var row in Model.TotalSum)
+                    @foreach (var row in Model.GrandTotalSum)
                     {
-                        <tr id="grandTotalRow">
+                        <tr id="grandTotalRow" style="height:3px;">
                             @foreach (var field in orderedColumns.Select((column, index) => new { column, index }))
                             {
                                 bool isPercentColumn = Model.isPercent != null && Model.isPercent.ContainsKey(field.column) && Model.isPercent[field.column] == true;
@@ -99,46 +183,45 @@
                                         var value = row[field.column];
                                         @* if (Model.ShowCard.ContainsKey(field.column))
                                         { *@
-                                            if (Model.NoOfDecimal.ContainsKey(field.column))
-                                            {
-                                                var decimalPlaces = Model.NoOfDecimal[field.column];
+                                        if (Model.NoOfDecimal.ContainsKey(field.column))
+                                        {
+                                            var decimalPlaces = Model.NoOfDecimal[field.column];
 
-                                                if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
-                                                {
-                                                    @decimalValue.ToString("F" + decimalPlaces)
-                                                }
-                                                else if (value is decimal || value is float || value is double)
-                                                {
-                                                    if (isPercentColumn)
-                                                    {
-                                                        @((Convert.ToDecimal(row[field.column])).ToString("F" + decimalPlaces) + " %")
-                                                    }
-                                                    else
-                                                    {
-                                                        @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
-                                                    }
-                                                }
-                                                else
-                                                {
-                                                    @value
-                                                }
+                                            if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                            {
+                                                @decimalValue.ToString("F" + decimalPlaces)
                                             }
                                             else if (value is decimal || value is float || value is double)
                                             {
                                                 if (isPercentColumn)
                                                 {
-                                                    @((Convert.ToDecimal(row[field.column])).ToString("F" + 1) + " %")
+                                                    @((Convert.ToDecimal(row[field.column])).ToString("F" + decimalPlaces) + " %")
                                                 }
                                                 else
                                                 {
-                                                    //@((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
-                                                    @Convert.ToInt32(value).ToString()
+                                                    @((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))
                                                 }
                                             }
                                             else
                                             {
                                                 @value
                                             }
+                                        }
+                                        else if (value is decimal || value is float || value is double)
+                                        {
+                                            if (isPercentColumn)
+                                            {
+                                                @((Convert.ToDecimal(row[field.column])).ToString("F" + 1) + " %")
+                                            }
+                                            else
+                                            {
+                                                @Convert.ToInt32(value).ToString()
+                                            }
+                                        }
+                                        else
+                                        {
+                                            @value
+                                        }
                                         //}
                                     }
                                     else if (field.index == 3)
@@ -327,17 +410,14 @@
                                                         if (formattedDecimalValue < (decimal)Model.ColorValue1)
                                                         {
                                                             backgroundColor = Model.ColorCode1;
-                                                            //ColorCodeCnt1 += 1;
                                                         }
                                                         else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && formattedDecimalValue < (decimal)Model.ColorValue2)
                                                         {
                                                             backgroundColor = Model.ColorCode2;
-                                                            // ColorCodeCnt2 += 1;
                                                         }
                                                         else if (formattedDecimalValue >= (decimal)Model.ColorValue2)
                                                         {
                                                             backgroundColor = Model.ColorCode3;
-                                                            //ColorCodeCnt3 += 1;
                                                         }
                                                     }
                                                     else
@@ -349,7 +429,7 @@
                                                 {
                                                     var decimalPlaces = Model.NoOfDecimal[field];
                                                     //decimal decimalVal = Convert.ToDecimal(value);
-                                                    decimal decimalVal = 0;  // default value in case it's DBNull
+                                                    decimal decimalVal = 0;  
                                                     if (value != DBNull.Value)
                                                     {
                                                         decimalVal = Convert.ToDecimal(value);
@@ -393,17 +473,14 @@
                                                     if (formattedDecimalValue < (decimal)Model.ColorValue1)
                                                     {
                                                         backgroundColor = Model.ColorCode1;
-                                                        //ColorCodeCnt1 += 1;
                                                     }
                                                     else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && formattedDecimalValue < (decimal)Model.ColorValue2)
                                                     {
                                                         backgroundColor = Model.ColorCode2;
-                                                        //ColorCodeCnt2 += 1;
                                                     }
                                                     else if (formattedDecimalValue >= (decimal)Model.ColorValue2)
                                                     {
                                                         backgroundColor = Model.ColorCode3;
-                                                        //ColorCodeCnt3 += 1;
                                                     }
                                                 }
                                                 else if (value is decimal || value is float || value is double)
@@ -429,8 +506,6 @@
                                                         formattedValue = value.ToString();
                                                     }
                                                 }
-                                                //TotalCount += 1;
-
                                             }
                                             else
                                             {
@@ -443,7 +518,6 @@
                                             </td>
                                         }
                                     </tr>
-
                                     rowIndex++;
                                 }
                             }
@@ -459,11 +533,9 @@
                             <tr class="@((rowIndex % 2 == 0) ? "even-row" : "odd-row")">
                                 @foreach (var field in orderedColumns)
                                 {
-                                    var backgroundColor = "transparent"; // Default background color
-                                    var formattedValue = ""; // Default value display
+                                    var backgroundColor = "transparent"; 
+                                    var formattedValue = ""; 
                                     decimal formattedDecimalValue;
-
-
 
                                     if (row.ContainsKey(field))
                                     {
@@ -499,17 +571,14 @@
                                                 if (formattedDecimalValue < (decimal)Model.ColorValue1)
                                                 {
                                                     backgroundColor = Model.ColorCode1;
-                                                    //ColorCodeCnt1 += 1;
                                                 }
                                                 else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && formattedDecimalValue < (decimal)Model.ColorValue2)
                                                 {
                                                     backgroundColor = Model.ColorCode2;
-                                                    // ColorCodeCnt2 += 1;
                                                 }
                                                 else if (formattedDecimalValue >= (decimal)Model.ColorValue2)
                                                 {
                                                     backgroundColor = Model.ColorCode3;
-                                                    //ColorCodeCnt3 += 1;
                                                 }
                                             }
                                             else
@@ -521,7 +590,7 @@
                                         {
                                             var decimalPlaces = Model.NoOfDecimal[field];
                                             //decimal decimalVal = Convert.ToDecimal(value);
-                                            decimal decimalVal = 0;  // default value in case it's DBNull
+                                            decimal decimalVal = 0;  
                                             if (value != DBNull.Value)
                                             {
                                                 decimalVal = Convert.ToDecimal(value);
@@ -529,7 +598,16 @@
 
                                             if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
                                             {
-                                                formattedValue = decimalValue.ToString("F" + decimalPlaces);
+                                                if (isPercentColumn)
+                                                {
+                                                    formattedDecimalValue = decimalVal;
+                                                    formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces) + " %";
+                                                }
+                                                else
+                                                {
+                                                    formattedDecimalValue = decimalVal;
+                                                    formattedValue = formattedDecimalValue.ToString("F" + decimalPlaces);
+                                                }
                                             }
                                             else if (value is decimal || value is float || value is double)
                                             {
@@ -565,17 +643,14 @@
                                             if (formattedDecimalValue < (decimal)Model.ColorValue1)
                                             {
                                                 backgroundColor = Model.ColorCode1;
-                                                //ColorCodeCnt1 += 1;
                                             }
                                             else if (formattedDecimalValue >= (decimal)Model.ColorValue1 && formattedDecimalValue < (decimal)Model.ColorValue2)
                                             {
                                                 backgroundColor = Model.ColorCode2;
-                                                //ColorCodeCnt2 += 1;
                                             }
                                             else if (formattedDecimalValue >= (decimal)Model.ColorValue2)
                                             {
                                                 backgroundColor = Model.ColorCode3;
-                                                //ColorCodeCnt3 += 1;
                                             }
                                         }
                                         else if (value is decimal || value is float || value is double)
@@ -614,8 +689,6 @@
                                                 formattedValue = value.ToString();
                                             }
                                         }
-                                        //TotalCount += 1;
-
                                     }
                                     else
                                     {
@@ -637,67 +710,20 @@
     </div>
 
 
-    <script>
+   
+    @* <script>
         document.addEventListener("DOMContentLoaded", function () {
             fixedColFunc();
             nonFixColorFunc();
         });
-    </script>
+    </script> *@
+
 
     <script>
-        $(document).ready(function () {
 
-            // for input text filter
-            $(".selectorinput").on("keyup", function () {
-                let columnId = $(this).attr("data-column");
-                let input = $(this).val().toLowerCase();
-
-                let $dropdown = $("#dropdown_" + columnId);
-                if ($dropdown.length) {
-                    $dropdown.find("option").each(function () {
-                        $(this).toggle($(this).text().toLowerCase().includes(input));
-                    });
-                }
-            });
-
-            // date picket filter
-            $(document).on("change", "#selectedDate", function () {
-                var selectedDate = $(this).val();
-                var columnId = $(this).data('column');
-                var selectedValue = $("#dropdown_" + columnId).val();
-
-                if (selectedDate || selectedValue) {
-                    fetchData(selectedDate, columnId, selectedValue);
-                }
-            });
-
-            // When click on the dropdown selection changes
-            $(".filter-dropdown").change(function () {
-                var columnId = $(this).data('column');
-                var selectedDate = $("#selectedDate").val();
-                var selectedValue = $(this).val();
-
-                if (selectedDate || selectedValue) {
-                    fetchData(selectedDate, columnId, selectedValue);
-                }
-            });
-
-            nonFixColorFunc();
-            fixedColFunc();
-        });
-
-    </script>
-
-    <script>
-        // all Js function
-
-        // Fetch data based on the selectedDate, columnId, and selectedValue
         function fetchData(dateParam, columnId, selectedValue) {
-
-            // Extract reportId from the URL path
             var pathSegments = window.location.pathname.split('/'); // Split URL by "/"
             var reportId = pathSegments[pathSegments.length - 1]; // Get the last segment
-
             $.ajax({
                 url: '/DynamicData/Index',
                 type: 'GET',
@@ -708,7 +734,6 @@
                     selectedValue: selectedValue
                 },
                 success: function (data) {
-                    //$("#dataTable").html(data); // Update the table content in the page
                     $("#wholepage").html(data); // Update the table content in the page
                 },
                 error: function (error) {
@@ -716,19 +741,20 @@
                 }
             });
         }
+        
 
         // non-fixed column color set
-        function nonFixColorFunc() {
-            var colorCode = '@Model.Color';
-            var elements = document.getElementsByClassName('non-fixed-column');
+        // function nonFixColorFunc() {
+        //     var colorCode = '@Model.Color';
+        //     var elements = document.getElementsByClassName('non-fixed-column');
 
-            for (var i = 0; i < elements.length; i++) {
-                elements[i].style.setProperty('background-color', colorCode, 'important');
-            }
-        }
+        //     for (var i = 0; i < elements.length; i++) {
+        //         elements[i].style.setProperty('background-color', colorCode, 'important');
+        //     }
+        // }
 
         // for fixed column
-        function fixedColFunc() {
+        //function fixedColFunc() {
             /* Reload the page when View Change Begin */
             // let lastViewportWidth = sessionStorage.getItem('lastViewportWidth');
             // let currentWidth = window.innerWidth;
@@ -750,45 +776,45 @@
 
             /* Dynamic fixed column handle Begin */
             // Get fixed columns from Razor model
-            var fixedColumns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.isFixedCol));
-            if (fixedColumns.length > 0) {
-                let leftPosition = 0;
-                let zIndex = 10;
+            // var fixedColumns = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.isFixedCol));
+            // if (fixedColumns.length > 0) {
+            //     let leftPosition = 0;
+            //     let zIndex = 10;
 
-                // Find column indexes dynamically
-                let headers = document.querySelectorAll("thead tr:nth-child(2) th");
-                let columnIndexMap = {};
+            //     // Find column indexes dynamically
+            //     let headers = document.querySelectorAll("thead tr:nth-child(2) th");
+            //     let columnIndexMap = {};
 
-                headers.forEach((th, index) => {
-                    let columnName = th.textContent.trim();
-                    if (fixedColumns.includes(columnName)) {
-                        columnIndexMap[columnName] = index + 1;
-                    }
-                });
+            //     headers.forEach((th, index) => {
+            //         let columnName = th.textContent.trim();
+            //         if (fixedColumns.includes(columnName)) {
+            //             columnIndexMap[columnName] = index + 1;
+            //         }
+            //     });
 
-                // Apply sticky styles to fixed columns
-                Object.keys(columnIndexMap).forEach((colName) => {
-                    let index = columnIndexMap[colName];
+            //         // Apply sticky styles to fixed columns
+            //         Object.keys(columnIndexMap).forEach((colName) => {
+            //         let index = columnIndexMap[colName];
 
-                    // Calculate the actual width of the column
-                    let firstCell = document.querySelector(`th:nth-child(${index})`);
-                    let columnWidth = firstCell ? firstCell.offsetWidth : 100;
+            //         // Calculate the actual width of the column
+            //         let firstCell = document.querySelector(`th:nth-child(${index})`);
+            //         let columnWidth = firstCell ? firstCell.offsetWidth : 100;
 
-                    document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
-                        cell.classList.add("fixed-column");
-                        cell.style.left = `${leftPosition}px`;
-                        cell.style.zIndex = zIndex;
-                        cell.style.minWidth = `${columnWidth}px`;
-                        cell.style.maxWidth = `${columnWidth}px`;
-                    });
+            //         document.querySelectorAll(`th:nth-child(${index}), td:nth-child(${index})`).forEach((cell) => {
+            //             cell.classList.add("fixed-column");
+            //             cell.style.left = `${leftPosition}px`;
+            //             cell.style.zIndex = zIndex;
+            //             cell.style.minWidth = `${columnWidth}px`;
+            //             cell.style.maxWidth = `${columnWidth}px`;
+            //         });
 
-                    // Increment leftPosition based on actual column width
-                    leftPosition += columnWidth;
-                    zIndex++;
-                });
-            }
+            //         // Increment leftPosition based on actual column width
+            //         leftPosition += columnWidth;
+            //         zIndex++;
+            //     });
+            // }
             /* Dynamic fixed column handle End */
-        }
+        //}
     </script>
 
 </body>

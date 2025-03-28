@@ -14,7 +14,7 @@ public class DbService
     }
 
     // Report Name List
-    public async Task<IEnumerable<DynamicReportListModel>> GetDynamicReportListAsync()
+    public async Task<IEnumerable<DynamicReportListModel>> Fnc_GetDynamicReportListAsync()
     {
         var reports = new List<DynamicReportListModel>();
 
@@ -52,35 +52,55 @@ public class DbService
     }
 
     // Execute all table from GetDynamicReport Stp
-    public (List<DataTable> resultSet1, List<DataTable> resultSet2, List<DataTable> resultSet3, List<DataTable> resultSet4, List<DataTable> resultSet5, List<DataTable> resultSet6, List<DataTable> resultSet7, List<DataTable> resultSet8, List<DataTable> resultSet9, List<DataTable> resultSet10) GetDynamicReportNew(int reportID)
+    //public (List<DataTable> resultSet1, List<DataTable> resultSet2, List<DataTable> resultSet3, List<DataTable> resultSet4, List<DataTable> resultSet5, List<DataTable> resultSet6, List<DataTable> resultSet7, List<DataTable> resultSet8, List<DataTable> resultSet9, List<DataTable> resultSet10) Fnc_GetDynamicReport(int reportID)
+    //{
+    //    using (SqlConnection connection = new SqlConnection(_connectionString))
+    //    {
+    //        SqlCommand command = new SqlCommand("GetDynamicReport", connection);
+    //        command.CommandType = CommandType.StoredProcedure;
+    //        command.Parameters.AddWithValue("@ReportID", reportID);
+
+    //        SqlDataAdapter adapter = new SqlDataAdapter(command);
+    //        DataSet dataSet = new DataSet();
+    //        adapter.Fill(dataSet);
+
+    //        List<DataTable> resultSet1 = new List<DataTable> { dataSet.Tables[0] };
+    //        List<DataTable> resultSet2 = new List<DataTable> { dataSet.Tables[1] };
+    //        List<DataTable> resultSet3 = new List<DataTable> { dataSet.Tables[2] };
+    //        List<DataTable> resultSet4 = new List<DataTable> { dataSet.Tables[3] };
+    //        List<DataTable> resultSet5 = new List<DataTable> { dataSet.Tables[4] };
+    //        List<DataTable> resultSet6 = new List<DataTable> { dataSet.Tables[5] };
+    //        List<DataTable> resultSet7 = new List<DataTable> { dataSet.Tables[6] }; // no of decimal
+    //        List<DataTable> resultSet8 = new List<DataTable> { dataSet.Tables[7] }; // color column
+    //        List<DataTable> resultSet9 = new List<DataTable> { dataSet.Tables[8] }; // percentage ratio
+    //        List<DataTable> resultSet10 = new List<DataTable> { dataSet.Tables[9] }; // ttl cnt
+
+    //        return (resultSet1, resultSet2, resultSet3, resultSet4, resultSet5, resultSet6, resultSet7, resultSet8, resultSet9, resultSet10);
+    //    }
+    //}
+    public List<DataTable> Fnc_GetDynamicReport(int reportID)
     {
         using (SqlConnection connection = new SqlConnection(_connectionString))
         {
-            SqlCommand command = new SqlCommand("GetDynamicReport", connection);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@ReportID", reportID);
+            using (SqlCommand command = new SqlCommand("GetDynamicReport", connection))
+            {
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@ReportID", reportID);
 
-            SqlDataAdapter adapter = new SqlDataAdapter(command);
-            DataSet dataSet = new DataSet();
-            adapter.Fill(dataSet);
+                using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+                {
+                    DataSet dataSet = new DataSet();
+                    adapter.Fill(dataSet);
 
-            List<DataTable> resultSet1 = new List<DataTable> { dataSet.Tables[0] };
-            List<DataTable> resultSet2 = new List<DataTable> { dataSet.Tables[1] };
-            List<DataTable> resultSet3 = new List<DataTable> { dataSet.Tables[2] };
-            List<DataTable> resultSet4 = new List<DataTable> { dataSet.Tables[3] };
-            List<DataTable> resultSet5 = new List<DataTable> { dataSet.Tables[4] };
-            List<DataTable> resultSet6 = new List<DataTable> { dataSet.Tables[5] };
-            List<DataTable> resultSet7 = new List<DataTable> { dataSet.Tables[6] }; // no of decimal
-            List<DataTable> resultSet8 = new List<DataTable> { dataSet.Tables[7] }; // color column
-            List<DataTable> resultSet9 = new List<DataTable> { dataSet.Tables[8] }; // percentage ratio
-            List<DataTable> resultSet10 = new List<DataTable> { dataSet.Tables[9] }; // ttl cnt
-
-            return (resultSet1, resultSet2, resultSet3, resultSet4, resultSet5, resultSet6, resultSet7, resultSet8, resultSet9, resultSet10);
+                    // Convert DataSet to a List of DataTables
+                    return dataSet.Tables.Cast<DataTable>().ToList();
+                }
+            }
         }
     }
-    
+
     // Execute all data in table
-    public async Task<List<Dictionary<string, object>>> DataAsync(string storedProcName, Dictionary<string, object> parameters)
+    public async Task<List<Dictionary<string, object>>> Fnc_LoadDataAsync(string storedProcName, Dictionary<string, object> parameters)
     {
         var resultList = new List<Dictionary<string, object>>();
         using (SqlConnection conn = new SqlConnection(_connectionString))
@@ -112,7 +132,7 @@ public class DbService
     }
     
     // Execute Total Grand for data
-    public async Task<List<Dictionary<string, object>>> TotalAsync(string storedProcName, Dictionary<string, object> parameters)
+    public async Task<List<Dictionary<string, object>>> Fnc_GrandTotalAsync(string storedProcName, Dictionary<string, object> parameters)
     {
         var resultList = new List<Dictionary<string, object>>();
         try
@@ -150,41 +170,79 @@ public class DbService
         }
         return resultList;
     }
-    
+
     // Execute subtotal stp
-    public async Task<List<Dictionary<string, object>>> SubTotalProcedureAsync(string storedProcName)
+    //public async Task<List<Dictionary<string, object>>> Fnc_SubTotalProcedureAsync(string storedProcName)
+    //{
+    //    var resultList = new List<Dictionary<string, object>>();
+    //    using (SqlConnection conn = new SqlConnection(_connectionString))
+    //    {
+    //        using (SqlCommand cmd = new SqlCommand(storedProcName, conn))
+    //        {
+    //            cmd.CommandType = CommandType.StoredProcedure;
+
+    //            if (storedProcName.Equals("GetFct_StoreNumberTotalMMM", StringComparison.OrdinalIgnoreCase))
+    //            {
+    //                cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 1, 6) });
+    //            }
+    //            else if (storedProcName.Equals("GetFct_StoreNumberTotalTM", StringComparison.OrdinalIgnoreCase))
+    //            {
+    //                cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 3) });
+    //            }
+
+    //            await conn.OpenAsync();
+    //            using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+    //            {
+    //                while (await reader.ReadAsync())
+    //                {
+    //                    var row = new Dictionary<string, object>();
+    //                    for (int i = 0; i < reader.FieldCount; i++)
+    //                    {
+    //                        row[reader.GetName(i)] = reader[i];
+    //                    }
+    //                    resultList.Add(row);
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return resultList;
+    //}
+    public async Task<List<Dictionary<string, object>>> Fnc_SubTotalProcedureAsync(string storedProcName, Dictionary<string, object> parameters)
     {
         var resultList = new List<Dictionary<string, object>>();
-        using (SqlConnection conn = new SqlConnection(_connectionString))
-        {
-            using (SqlCommand cmd = new SqlCommand(storedProcName, conn))
-            {
-                cmd.CommandType = CommandType.StoredProcedure;
 
-                if (storedProcName.Equals("GetFct_StoreNumberTotalMMM", StringComparison.OrdinalIgnoreCase))
+        try
+        {
+            using (var conn = new SqlConnection(_connectionString))
+            using (var cmd = new SqlCommand(storedProcName, conn) { CommandType = CommandType.StoredProcedure })
+            {
+                // Add parameters dynamically, ensuring null values are handled
+                foreach (var param in parameters)
                 {
-                    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 1, 6) });
-                }
-                else if (storedProcName.Equals("GetFct_StoreNumberTotalTM", StringComparison.OrdinalIgnoreCase))
-                {
-                    cmd.Parameters.Add(new SqlParameter("@DateParam", SqlDbType.Date) { Value = new DateTime(2025, 2, 3) });
+                    cmd.Parameters.AddWithValue(param.Key, param.Value ?? DBNull.Value);
                 }
 
                 await conn.OpenAsync();
-                using (SqlDataReader reader = await cmd.ExecuteReaderAsync())
+                using (var reader = await cmd.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
                     {
                         var row = new Dictionary<string, object>();
                         for (int i = 0; i < reader.FieldCount; i++)
                         {
-                            row[reader.GetName(i)] = reader[i];
+                            row[reader.GetName(i)] = reader.IsDBNull(i) ? null : reader[i];
                         }
                         resultList.Add(row);
                     }
                 }
             }
         }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error executing stored procedure '{storedProcName}': {ex.Message}");
+            throw;
+        }
+
         return resultList;
     }
 
