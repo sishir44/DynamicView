@@ -50,17 +50,17 @@
         white-space:nowrap;
     }
 
-    // .sub-column {
-    //     display: flex;
-    //     flex-direction: column;
-    //     gap: 5px;
-    //     border: 1px solid green;
-    //     padding: 10px;
-    //     min-width: 180px; /* Adjust width as needed */
-    //     align-items: center;
-    //     background-color: #f9f9f9;
-    //     border-radius: 6px;
-    // }
+    .sub-column {
+        display: flex;
+        flex-direction: column;
+        gap: 1px;
+        border: 1px solid black hidden;
+        padding: 10px;
+        min-width: auto; /* Adjust width as needed */
+        align-items: center;
+        background-color: #f9f9f9;
+        border-radius: 6px;
+    }
 
 
     .collabel {
@@ -80,7 +80,7 @@
     .maindivshow input.showcardinput {
         font-size: 10px;
         height: 24px;
-        width: 50px;
+        width: auto;
         border-radius: 6px;
         text-align: center;
         background-color: lightblue;
@@ -191,25 +191,107 @@
                                     <label class="collabel">@columnsToShow[i]</label>
                                     @if (Model.GrandTotalSum != null)
                                     {
+                                        bool isPercentColumn = Model.isPercent != null && Model.isPercent.ContainsKey(@columnsToShow[i]) && Model.isPercent[@columnsToShow[i]] == true;
                                         @foreach (var row in Model.GrandTotalSum)
                                         {
                                             if (row.ContainsKey(columnsToShow[i]))
                                             {
-                                                <input type="button" class="showcardinput" value="@row[columnsToShow[i]]" readonly />
+                                                var value = @row[columnsToShow[i]];
+
+                                                if (Model.NoOfDecimal.ContainsKey(columnsToShow[i]))
+                                                {
+                                                    var decimalPlaces = Model.NoOfDecimal[columnsToShow[i]];
+                                                    if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                                    {
+                                                        <input type="button" class="showcardinput" value="@decimalValue.ToString("F" + decimalPlaces)" readonly />
+                                                    }
+                                                    else if (value is decimal || value is float || value is double)
+                                                    {
+                                                        if (isPercentColumn)
+                                                        {
+                                                            <input type="button" class="showcardinput" value="@((Convert.ToDecimal(row[columnsToShow[i]])).ToString("F" + decimalPlaces) + " %")" readonly />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="button" class="showcardinput" value="@((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))" readonly />
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="button" class="showcardinput" value="@row[columnsToShow[i]]" readonly />
+                                                    }
+                                                }
+                                                else if (value is decimal || value is float || value is double)
+                                                {
+                                                    if (isPercentColumn)
+                                                    {
+                                                        <input type="button" class="showcardinput" value="@((Convert.ToDecimal(row[columnsToShow[i]])).ToString("F" + 1) + " %")" readonly />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="button" class="showcardinput" value="@Convert.ToInt32(value).ToString()" readonly />
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    <input type="button" class="showcardinput" value="@row[columnsToShow[i]]" readonly />
+                                                }
+                                                // <input type="button" class="showcardinput" value="@row[columnsToShow[i]]" readonly />
                                             }
                                         }
                                     }
-
+                                    <br/>
                                     @if (i + 1 < totalColumns) // Check if second row exists
                                     {
                                         <label class="collabel">@columnsToShow[i + 1]</label>
                                         @if (Model.GrandTotalSum != null)
                                         {
+                                            bool isPercentColumn = Model.isPercent != null && Model.isPercent.ContainsKey(@columnsToShow[i + 1]) && Model.isPercent[@columnsToShow[i + 1]] == true;
                                             @foreach (var row in Model.GrandTotalSum)
                                             {
                                                 if (row.ContainsKey(columnsToShow[i + 1]))
                                                 {
-                                                    <input type="button" class="showcardinput" value="@row[columnsToShow[i + 1]]" readonly />
+                                                    var value = @row[columnsToShow[i + 1]];
+
+                                                    if (Model.NoOfDecimal.ContainsKey(columnsToShow[i + 1]))
+                                                    {
+                                                        var decimalPlaces = Model.NoOfDecimal[columnsToShow[i + 1]];
+                                                        if (value is string strValue && decimal.TryParse(strValue, out decimal decimalValue))
+                                                        {
+                                                            <input type="button" class="showcardinput" value="@decimalValue.ToString("F" + decimalPlaces)" readonly />
+                                                        }
+                                                        else if (value is decimal || value is float || value is double)
+                                                        {
+                                                            if (isPercentColumn)
+                                                            {
+                                                                <input type="button" class="showcardinput" value="@((Convert.ToDecimal(row[columnsToShow[i+1]])).ToString("F" + decimalPlaces) + " %")" readonly />
+                                                            }
+                                                            else
+                                                            {
+                                                                <input type="button" class="showcardinput" value="@((Convert.ToDecimal(value)).ToString("F" + decimalPlaces))" readonly />
+                                                            }
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="button" class="showcardinput" value="@row[columnsToShow[i+1]]" readonly />
+                                                        }
+                                                    }
+                                                    else if (value is decimal || value is float || value is double)
+                                                    {
+                                                        if (isPercentColumn)
+                                                        {
+                                                            <input type="button" class="showcardinput" value="@((Convert.ToDecimal(row[columnsToShow[i+1]])).ToString("F" + 1) + " %")" readonly />
+                                                        }
+                                                        else
+                                                        {
+                                                            <input type="button" class="showcardinput" value="@Convert.ToInt32(value).ToString()" readonly />
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="button" class="showcardinput" value="@row[columnsToShow[i+1]]" readonly />
+                                                    }
+                                                    // <input type="button" class="showcardinput" value="@row[columnsToShow[i + 1]]" readonly />
                                                 }
                                             }
                                         }
